@@ -1,4 +1,6 @@
+// This file is messy, since it was meant for learning purposes
 #include "cclass.h"
+#include "string.h"
 
 int main(int argc, char** argv) {
     printf("Constant BUFFERSIZE has a value of %d \n", BUFFERSIZE);
@@ -55,9 +57,6 @@ int main(int argc, char** argv) {
     *z_pointer = 6;
     printf("The new value of z is %d\n", *z_pointer);
 
-    char hello_world[12] = {'h','e','l','l','o',' ','w','o','r','l','d'};
-    printf("%s", hello_world);
-
     char hello_world[12] = {'h','e','l','l','o',' ','w','o','r','l','d', '\0'};
     printf("%s\n", hello_world);
 
@@ -72,18 +71,14 @@ int main(int argc, char** argv) {
     hello_world_init[1] = 'u';
     printf("The new string is %s\n", hello_world_init);
 
-    //allocates in a read-only portion of static memory, NOT modifiable, READ only
-    char *hello_world_readonly = "hello world";
-    printf("%s\n", hello_world_readonly);
-
     hello_world_readonly[1] = 'u'; //this results in unpredictable behavior
     printf("The new string is %s\n", hello_world_readonly);
 
     char hello_world_array[12] = "hello world";
     char *hello_world_pointer = hello_world_array;
 
-    printf("hello_world_pointer: %d\n", hello_world_pointer)
-    printf("hello_world_array: %d\n", hello_world_array)
+    printf("hello_world_pointer: %d\n", hello_world_pointer);
+    printf("hello_world_array: %d\n", hello_world_array);
 
     char sentence[BUFFERSIZE] = "";
     sprintf(sentence, "Hello World");
@@ -134,35 +129,35 @@ int main(int argc, char** argv) {
     struct address my_Addrs = {"Another Road", 15, "Lower Changi"};
     printf("Another address %s %d %s \n", my_Addrs.area_name, my_Addrs.house_no, my_Addrs.district);
 
-    struct address {
+    struct another_address {
         char area_name[32];
         int house_no;
         char district[32];
     };
 
-    struct Info {
+    struct Another_Info {
         char name[32];
         int age;
         struct address address; //now this is a member
     };
 
-    struct Info my_Info = {"Alice", 25, "Somapah Road", 8, "Upper Changi"};
+    struct Another_Info another_my_Info = {"Alice", 25, "Somapah Road", 8, "Upper Changi"};
 
-    printf("Name: %s, age %d, area name %s, house number %d, district %s\n", my_Info.name, my_Info.age, my_Info.address.area_name, my_Info.address.house_no, my_Info.address.district);
+    printf("Name: %s, age %d, area name %s, house number %d, district %s\n", another_my_Info.name, another_my_Info.age, another_my_Info.address.area_name, another_my_Info.address.house_no, another_my_Info.address.district);
 
-    struct address my_Addrs = {"Another Road", 15, "Lower Changi"};
-    printf("Another address %s %d %s \n", my_Addrs.area_name, my_Addrs.house_no, my_Addrs.district);
+    struct another_address another_my_Addrs = {"Another Road", 15, "Lower Changi"};
+    printf("Another address %s %d %s \n", another_my_Addrs.area_name, another_my_Addrs.house_no, another_my_Addrs.district);
 
-    struct Vector_Int{
+    struct Another_Vector_Int{
         int x;
         int y;
         int z;
         char name[64];
     };
 
-    struct Vector_Int vector_sample;
+    struct Another_Vector_Int vector_sample;
 
-    printf("Size of Vector_Int struct is %d bytes\n", sizeof(struct Vector_Int));
+    printf("Size of Vector_Int struct is %d bytes\n", sizeof(struct Another_Vector_Int));
     printf("Size of its members are x %d bytes, y %d bytes, z %d bytes, and name %d bytes\n", sizeof(vector_sample.x), sizeof(vector_sample.y), sizeof(vector_sample.z), sizeof(vector_sample.name));
 
     struct Info many_info[3] = {{"Alice", 25, "Somapah Road", 8, "Upper Changi"},
@@ -174,12 +169,12 @@ int main(int argc, char** argv) {
     }
 
     typedef struct Info InfoData;
-    InfoData many_info[3] = {{"Alice", 25, "Somapah Road", 8, "Upper Changi"},
-                                {"Bob", 22, "Somapah Road", 19, "Upper Changi"},
-                                {"Michael", 30, "Another Road", 25, "East Changi"}};
+    InfoData another_many_info[3] = {{"Alice", 25, "Somapah Road", 8, "Upper Changi"},
+                                     {"Bob", 22, "Somapah Road", 19, "Upper Changi"},
+                                     {"Michael", 30, "Another Road", 25, "East Changi"}};
 
     for (int i = 0; i < 3; i++) {
-        printf("Name: %s, age %d, area name %s, house number %d, district %s\n", many_info[i].name, many_info[i].age, many_info[i].address.area_name, many_info[i].address.house_no, many_info[i].address.district);
+        printf("Name: %s, age %d, area name %s, house number %d, district %s\n", another_many_info[i].name, another_many_info[i].age, another_many_info[i].address.area_name, another_many_info[i].address.house_no, another_many_info[i].address.district);
     }
 
     float array_floats[8];
@@ -211,28 +206,28 @@ int main(int argc, char** argv) {
         printf("%c ", c);
     } // c does not exist out of the for-loop scope
 
-    char c;
+    char ch;
     for (int i = 0; i<128; i++) {
-        c = i;
-        printf("%c ", c);
+        ch = i;
+        printf("%c ", ch);
     }
-    //c exists, as 127
-    printf("final c: %c.\n", c); //its a space
+    //ch exists, as 127
+    printf("final c: %c.\n", ch); //its a space
 
     float output = square(3.f);
     printf("Output is %f \n", output);
 
-    Vector v1 = {3,7,10};
-    printf("Address of v1 members: 0x%llx, 0x%llx, 0x%llx\n", &v1.x, &v1.y, &v1.z);
-    print_vector(v1);
-    v1 = clear_vector(v1);
-    print_vector(v1);
+    Vector v3 = {3,7,10};
+    printf("Address of v1 members: 0x%llx, 0x%llx, 0x%llx\n", &v3.x, &v3.y, &v3.z);
+    print_vector(v3);
+    v3 = clear_vector(v3);
+    print_vector(v3);
 
-    Vector v2 = {31,99,21};
-    printf("Address of v2 members: 0x%llx, 0x%llx, 0x%llx\n", &v2.x, &v2.y, &v2.z);
-    print_vector(v2);
-    clear_vector_byreference(&v2);
-    print_vector(v2);
+    Vector v4 = {31,99,21};
+    printf("Address of v2 members: 0x%llx, 0x%llx, 0x%llx\n", &v4.x, &v4.y, &v4.z);
+    print_vector(v4);
+    clear_vector_byreference(&v4);
+    print_vector(v4);
 
     printf("The global variable is %d \n", global_variable);
     test_global();
@@ -248,15 +243,15 @@ int main(int argc, char** argv) {
     scanf("%d", &buffersize);
 
     //allocates memory in heap
-    int *x = (int*) malloc(sizeof(int)*buffersize); //type cast it
+    int *d = (int*) malloc(sizeof(int)*buffersize); //type cast it
     //print the address x is pointing to
-    printf("Memory address allocated by malloc starts at 0x%llx\n", x);
+    printf("Memory address allocated by malloc starts at 0x%llx\n", d);
     //print the address of the pointer x
-    printf("This pointer is stored at address 0x%llx\n", &x);
+    printf("This pointer is stored at address 0x%llx\n", &d);
 
     // do something with the array
     for (int i = 0; i < buffersize; i++) {
-        x[i] = i;
+        d[i] = i;
     }
 
     printf("Enter additional number of elements: ");
@@ -264,18 +259,18 @@ int main(int argc, char** argv) {
 
     //resize the array, buffersize can be smaller than original amount. The remainder is automatically freed
     //the unused memory initially pointed by x is also automatically freed
-    int *y = realloc(x, buffersize);
-    printf("Memory address allocated by realloc starts at 0x%llx\n", y);
-    printf("Memory address allocated by realloc ends at 0x%llx\n", y + buffersize);
-    printf("This new pointer is stored at address 0x%llx\n", &y);
+    int *w = realloc(d, buffersize);
+    printf("Memory address allocated by realloc starts at 0x%llx\n", w);
+    printf("Memory address allocated by realloc ends at 0x%llx\n", w + buffersize);
+    printf("This new pointer is stored at address 0x%llx\n", &w);
     for (int i = 0; i < buffersize; i++) {
-        printf("Original content element %d is %d \n", i, x[i]);
-        x[i] += i; //do something with the array
+        printf("Original content element %d is %d \n", i, d[i]);
+        d[i] += i; //do something with the array
     }
 
     //free heap manually
-    free(y);
-    free(x);
+    free(w);
+    free(d);
 
     //persistence
     test();
@@ -294,33 +289,33 @@ int main(int argc, char** argv) {
     //free the memory allocated
     free(pointer);
 
-    int buffersize;
+    int temp_buffersize;
     printf("Enter total number of elements: ");
-    scanf("%d", &buffersize);
+    scanf("%d", &temp_buffersize);
 
     //allocates memory in heap
-    int *x = (int*) malloc(sizeof(char)*buffersize); //type cast it
+    int *m = (int*) malloc(sizeof(char)*temp_buffersize); //type cast it
 
     //initialize to some value
     printf("The original array value is : ");
-    for (int i = 0; i < buffersize; i++) {
-        x[i] = i;
-        printf("%d ", x[i]);
+    for (int i = 0; i < temp_buffersize; i++) {
+        m[i] = i;
+        printf("%d ", m[i]);
     }
     printf("\n");
 
     //pass it to the function to modify
-    modify_array(x, buffersize);
+    modify_array(m, temp_buffersize);
 
     //print its content
     printf("The new array value is : ");
-    for (int i = 0; i < buffersize; i++) {
-            printf("%d ", x[i]);
+    for (int i = 0; i < temp_buffersize; i++) {
+            printf("%d ", m[i]);
     }   
     printf("\n");
 
     //free it
-    free(x);
+    free(m);
 
     // At the end of the third call of function1, the final value of x is 8.
     function1();
@@ -392,6 +387,7 @@ int* test_malloc(int size_array) {
 void modify_array(int* array, int array_size) {
     for (int i = 0; i < array_size; i++) {
         array[i] += i;
+    }
 }
 
 /*
