@@ -19,7 +19,7 @@ char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/202
 static int create_daemon()
 {
 
-    /* TASK 7 */
+    /** TASK 7 **/
     // Incantation on creating a daemon with fork() twice
 
     // 1. Fork() from the parent process

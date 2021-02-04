@@ -1,2 +1,12 @@
 .DS_Store
 Thumbs.db
+
+# Exclude generated executables and binary files
+customshell
+shellPrograms/checkdaemon
+shellPrograms/countline
+shellPrograms/display
+shellPrograms/find
+shellPrograms/listdir
+shellPrograms/listdirall
+shellPrograms/summond
