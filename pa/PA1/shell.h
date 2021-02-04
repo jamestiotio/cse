@@ -53,7 +53,7 @@ Functions of the shell interface
 int shellCD(char **args);
 int shellHelp(char **args);
 int shellExit(char **args);
-int shellUsage (char** args);
+int shellUsage(char** args);
 int shellDisplayFile(char** args);
 int shellCountLine(char** args);
 int shellListDir(char** args);

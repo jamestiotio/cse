@@ -4,7 +4,7 @@
 int shellCheckDaemon_code()
 {
 
-   /* TASK 8 */
+   /** TASK 8 **/
    //Create a command that trawl through output of ps -efj and contains "summond"
    char *command = malloc(sizeof(char) * 256);
    sprintf(command, "ps -efj | grep summond  | grep -v tty > output.txt");
