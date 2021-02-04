@@ -251,11 +251,57 @@ int shellExecuteInput(char **args)
   // 1. Check if args[0] is NULL. If it is, an empty command is entered, return 1
   // 2. Otherwise, check if args[0] is in any of our builtin_commands, and that it is NOT cd, help, exit, or usage.
   // 3. If conditions in (2) are satisfied, perform fork(). Check if fork() is successful.
-  // 4. For the child process, execute the appropriate functions depending on the command in args[0]. Pass char ** args to the function.
+  // 4. For the child process, execute the appropriate functions depending on the command in args[0]. Pass char** args to the function.
   // 5. For the parent process, wait for the child process to complete and fetch the child's return value.
   // 6. Return the child's return value to the caller of shellExecuteInput
   // 7. If args[0] is not in builtin_command, print out an error message to tell the user that command doesn't exist and return 1
 
+  if (args[0] == NULL) {
+    // An empty command was entered
+    return 1;
+  }
+
+  // Check if the command exists in the command list
+  for (int i = 0; i < numOfBuiltinFunctions(); i++)
+  {
+    if (strcmp(args[0], builtin_commands[i]) == 0)
+    {
+      // Hardcoded check
+      if (i != 0 && i != 1 && i != 2 && i != 3)
+      {
+        // Create a new process to run the function with the specific command, except if it is cd, help, exit or usage
+        pid_t pid = fork();
+        
+        // Check for fork()'s exit status code
+        if (pid == 0)
+        {
+          int status = (*builtin_commandFunc[i])(args);
+          exit(status);
+        }
+        else if (pid < 0)
+        {
+          perror("Fork does not work and it has failed. Exiting program...");
+          exit(EXIT_FAILURE);
+        }
+        else
+        {
+          int stat_loc;
+          printf("Fork works, waiting for child process to finish...\n");
+          // Wait until the process has finished running
+          waitpid(pid, &stat_loc, WUNTRACED);
+          return stat_loc;
+        }
+      }
+      else
+      {
+        // For cd, help, exit or usage commands, do the command in this same process space
+        return (*builtin_commandFunc[i])(args);
+      }
+    }
+  }
+
+  // Otherwise, print the error message
+  printf("Invalid command received. Type help to see what commands are implemented.\n");
   return 1;
 }
 
@@ -272,7 +318,17 @@ char *shellReadLine(void)
   // 3. Fetch an entire line from input stream stdin using getline() function. getline() will store user input onto the memory location allocated in (1)
   // 4. Return the char*
 
-  return NULL;
+  size_t bufsize = SHELL_BUFFERSIZE;
+  char* line = (char*) malloc(SHELL_BUFFERSIZE * sizeof(char));
+
+  if (!line) {
+    perror("Undefined input due to allocation error for input buffer. Exiting program...\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  getline(&line, &bufsize, stdin);
+
+  return line;
 }
 
 /**
@@ -281,14 +337,38 @@ char *shellReadLine(void)
 
 char **shellTokenizeInput(char *line)
 {
-
   /** TASK 2 **/
   // 1. Allocate a memory space to contain pointers (addresses) to the first character of each word in *line. Malloc should return char** that persists after the function terminates.
-  // 2. Check that char ** that is returend by malloc is not NULL
+  // 2. Check that char** that is returned by malloc is not NULL
   // 3. Tokenize the *line using strtok() function
-  // 4. Return the char **
+  // 4. Return the char**
 
-  return NULL;
+  // Define an array of pointers to each of the first chars that mark the tokens in the line
+  char** tokens = (char**) malloc(SHELL_BUFFERSIZE * sizeof(char*));
+
+  if (!tokens) {
+    perror("Null address specified and allocation error encountered. Exiting program...");
+    exit(EXIT_FAILURE);
+  }
+
+  int index_position = 0;
+  // Tokenize the line and store it at **tokens
+  char* current_token = strtok(line, SHELL_INPUT_DELIM);
+  tokens[index_position] = current_token;
+  index_position++;
+
+  while (current_token != NULL)
+  {
+    // Tokenize the rest of the inputs
+    current_token = strtok(NULL, SHELL_INPUT_DELIM);
+    tokens[index_position] = current_token;
+    current_token++;
+  }
+
+  // Add a NULL to terminate the line at the end
+  tokens[index_position] = NULL;
+
+  return tokens;
 }
 
 /**
@@ -301,7 +381,6 @@ void shellLoop(void)
   char *line;  // to accept the line of string from user
   char **args; // to tokenize them as arguments separated by spaces
   int status;  // to tell the shell program whether to terminate shell or not
-
 
   /** TASK 5 **/
   //write a loop where you do the following: 
