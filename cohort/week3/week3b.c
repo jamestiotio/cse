@@ -5,6 +5,7 @@
 
 int main(int argc, char const *argv[])
 {
+    // Total number of processes, including the original parent, is 2^level
     int level = 3;
     pid_t pid[level];
 
