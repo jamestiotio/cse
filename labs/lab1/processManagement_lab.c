@@ -44,7 +44,7 @@ void job_dispatch(int i){
 /** 
  * Setup function to create shared mems and semaphores
  * **/
-void setup(){
+void setup() {
 
     // TODO#1:  a. Create shared memory for global_data struct (see processManagement_lab.h)
     //          b. When shared memory is successfully created, set the initial values of "max" and "min" of the global_data struct in the shared memory accordingly
@@ -57,34 +57,96 @@ void setup(){
     //          g. Return to main
 
     ShmID_global_data = shmget(IPC_PRIVATE, sizeof(global_data), IPC_CREAT | 0666);
-    if (ShmID_global_data == -1){
+    if (ShmID_global_data == -1) {
         printf("Global data shared memory creation failed\n");
         exit(EXIT_FAILURE);
     }
     ShmPTR_global_data = (global_data *) shmat(ShmID_global_data, NULL, 0);
-    if ((int) ShmPTR_global_data == -1){
+    if ((int) ShmPTR_global_data == -1) {
         printf("Attachment of global data shared memory failed \n");
         exit(EXIT_FAILURE);
     }
 
-    //set global data min and max
+    // Set global data min and max
     ShmPTR_global_data->max = -1;
     ShmPTR_global_data->min = INT_MAX;
-    
-    return;
 
+    // Create a named semaphore with name "semglobaldata" of init size 1 (semaphores must be unique by name)
+    sem_global_data = sem_open("semglobaldata", O_CREAT | O_EXCL, 0644, 1);
+
+    // Check if semaphore creation has failed
+    while (true) {
+        if (sem_global_data == SEM_FAILED) {
+            // Try to unlink since chances are it failed because there's already a semaphore with the specified name (maybe from a previously executed program, etc.)
+            sem_unlink("semglobaldata");
+            // Try to open again
+            sem_global_data = sem_open("semglobaldata", O_CREAT | O_EXCL, 0644, 1);
+        }
+        else {
+            break;
+        }
+    }
+
+    ShmID_jobs = shmget(IPC_PRIVATE, sizeof(job) * number_of_processes, IPC_CREAT | 0666);
+    if (ShmID_jobs == -1) {
+        exit(EXIT_FAILURE);
+    }
+    shmPTR_jobs_buffer = (job *) shmat(ShmID_jobs, NULL, 0);
+    if ((int) shmPTR_jobs_buffer == -1) {
+        exit(EXIT_FAILURE);
+    }
+
+    shmPTR_jobs_buffer->task_status = 0;
+
+    for (int i = 0; i < number_of_processes; i++) {
+        char *sem_name = malloc(sizeof(char) * 16);
+        sprintf(sem_name, "semjobs%d", i);
+        sem_jobs_buffer[i] = sem_open(sem_name, O_CREAT | O_EXCL, 0644, 0);
+        while (true) {
+            if (sem_global_data == SEM_FAILED) {
+                sem_unlink(sem_name);
+                sem_jobs_buffer[i] = sem_open(sem_name, O_CREAT | O_EXCL, 0644, 0);
+            }
+            else {
+                break;
+            }
+        }
+        free(sem_name);
+    }
+
+    return;
 }
 
 /**
  * Function to spawn all required children processes
  **/
  
-void createchildren(){
+void createchildren() {
     // TODO#2:  a. Create number_of_processes children processes
     //          b. Store the pid_t of children i at children_processes[i]
     //          c. For child process, invoke the method job_dispatch(i)
     //          d. For the parent process, continue creating the next children
     //          e. After number_of_processes children are created, return to main 
+
+    for (int i = 0; i < number_of_processes; i++) {
+        pid_t pid;
+        pid = fork(); // Both the parent and the child return from the fork()
+        children_processes[i] = pid;
+
+        if (pid < 0) {
+            // Some error happens
+            exit(-1);
+        }
+        else if (pid == 0) {
+            // Child process
+            children_processes[i] = getpid();
+            job_dispatch(i);
+        }
+        else {
+            // Parent process
+            continue;
+        }
+    }
 
     return;
 }
