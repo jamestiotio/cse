@@ -5,7 +5,6 @@
 */
 int shellFind(char **args)
 {
-
   printf("shellFind is called!\n");
 
   /** TASK 4 **/
@@ -15,6 +14,11 @@ int shellFind(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellFind if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/find", args) == -1) {
+    perror("Failed to execute find! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -32,6 +36,11 @@ int shellDisplayFile(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellDisplayFile if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/display", args) == -1) {
+    perror("Failed to execute display! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -40,7 +49,6 @@ int shellDisplayFile(char **args)
 */
 int shellListDirAll(char **args)
 {
-
   printf("shellListDirAll is called!\n");
 
   /** TASK 4 **/
@@ -50,6 +58,11 @@ int shellListDirAll(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellListDirAll if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/listdirall", args) == -1) {
+    perror("Failed to execute listdirall! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -67,6 +80,11 @@ int shellListDir(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellListDir
 
+  if (execvp("./shellPrograms/listdir", args) == -1) {
+    perror("Failed to execute listdir! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -85,6 +103,11 @@ int shellCountLine(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellCountLine if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/countline", args) == -1) {
+    perror("Failed to execute countline! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -102,6 +125,11 @@ int shellSummond(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellDaemonize if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/summond", args) == -1) {
+    perror("Failed to execute summond! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -121,6 +149,11 @@ int shellCheckDaemon(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellCheckDaemon if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/checkdaemon", args) == -1) {
+    perror("Failed to execute checkdaemon! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -362,7 +395,7 @@ char **shellTokenizeInput(char *line)
     // Tokenize the rest of the inputs
     current_token = strtok(NULL, SHELL_INPUT_DELIM);
     tokens[index_position] = current_token;
-    current_token++;
+    index_position++;
   }
 
   // Add a NULL to terminate the line at the end
