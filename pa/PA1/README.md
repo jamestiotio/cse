@@ -14,3 +14,8 @@ In this programming assignment, we are tasked to create a shell as well as a dae
 - Parse user input and invoke `fork()` with the appropriate program
 - Create a program that results in a daemon process
 - Use the shell to keep track the state of the corresponding daemon processes
+
+Features for future development:
+
+- Tab completion
+- Run custom executables/binaries (by indicating their path as the first argument/token)
