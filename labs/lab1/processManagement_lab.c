@@ -99,6 +99,9 @@ void setup() {
     shmPTR_jobs_buffer->task_status = 0;
 
     for (int i = 0; i < number_of_processes; i++) {
+        // We use 16 bytes because of these (follow the same method as testmain_todo1 and to avoid occasional segmentation faults):
+        // - https://stackoverflow.com/a/40679845
+        // - https://stackoverflow.com/a/17298238
         char *sem_name = malloc(sizeof(char) * 16);
         sprintf(sem_name, "semjobs%d", i);
         sem_jobs_buffer[i] = sem_open(sem_name, O_CREAT | O_EXCL, 0644, 0);
@@ -187,7 +190,7 @@ void main_loop(char* fileName){
     while ((wpid = wait(NULL)) > 0){
         process_waited_final ++;
     }
-    
+
     // print final results
     printf("Final results: sum -- %ld, odd -- %ld, min -- %ld, max -- %ld, total task -- %ld\n", ShmPTR_global_data->sum_work, ShmPTR_global_data->odd, ShmPTR_global_data->min, ShmPTR_global_data->max, ShmPTR_global_data->total_tasks);
 }

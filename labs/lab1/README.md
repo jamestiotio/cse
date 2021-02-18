@@ -12,6 +12,8 @@ In this lab, we are tasked to manage a pool of UNIX resources. In particular, we
   - Respawn (prematurely) terminated children processes
 - Perform basic I/O operations
 
+To compile the script, run this command: `gcc -o out processManagement_lab.c -lpthread` (necessary when implementing threads and semaphores, since we need to link with the `pthread` library).
+
 ## TODO #4a Explanation on Design of Worker Process Revival & Termination Method
 
 Coming soon!
