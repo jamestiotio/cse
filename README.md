@@ -7,3 +7,7 @@ This repository is divided into 4 sections/folders:
 2. [Homework](./hw) (Individual)
 3. [Labs](./labs) (Individual)
 4. [Programming Assignments](./pa) (Group/Pair Work)
+
+## Small GCC Compilation Note
+
+Whenever `pthread.h` or `semaphore.h` is included, do remember to include either the `-pthread` or the `-lpthread` compilation flag to `gcc`.
