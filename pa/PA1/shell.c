@@ -414,7 +414,6 @@ void shellLoop(void)
   char *line;  // to accept the line of string from user
   char **args; // to tokenize them as arguments separated by spaces
   int status;  // to tell the shell program whether to terminate shell or not
-
   /** TASK 5 **/
   //write a loop where you do the following: 
 
@@ -428,16 +427,35 @@ void shellLoop(void)
   // 7. free memory location containing char* to the first letter of each word in the input string
   // 8. check if shellExecuteInput returns 1. If yes, loop back to Step 1 and prompt user with new input. Otherwise, exit the shell. 
 
+  //call shellReadLine that returns char pointer
 
+    printf("CSEShell> ");
+    line = shellReadLine();
+    printf("Type: %s \n", line);
+    args = shellTokenizeInput(line);
+    status = shellExecuteInput(args);
+    free(args);
+    free(line);
+    //printf("This is the value of status %d end \n",status);
+    if (status == 1){
+      printf("Continue loop \n");
+      shellLoop();
+    }
+    exit(1);
 }
+
+
 
 int main(int argc, char **argv)
 {
+  
+ printf("Shell Run successful. Running now: \n");
+ 
+ // Run command loop
+ shellLoop();
+ return 0;
 
-  printf("Shell Run successful. Running now: \n");
-
-  // Run command loop
-  shellLoop();
-
-  return 0;
+ 
 }
+
+
