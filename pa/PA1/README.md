@@ -19,3 +19,4 @@ Features for future development:
 
 - Tab completion
 - Run custom executables/binaries (by indicating their path as the first argument/token)
+- Other OhMy ZSH features like power10K design 
