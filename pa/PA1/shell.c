@@ -440,6 +440,9 @@ void shellLoop(void)
     if (status == 1){
       printf("Continue loop \n");
       shellLoop();
+      //added temporarily to free the stack
+      free(line);
+      free(args);
     }
     exit(1);
 }
