@@ -12,7 +12,7 @@
 
 #include "shellPrograms.h"
 
-//TODO: change to appropriate path
+// TODO: change to appropriate path
 char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/2020/PA1 Makeshell Daemon/PA1/logfile_test.txt";
 
 /*This function summons a daemon process out of the current process*/
@@ -41,7 +41,7 @@ static int daemon_work()
     int num = 0;
     FILE *fptr;
 
-    //write PID of daemon in the beginning
+    // Write PID of daemon in the beginning
     fptr = fopen(path, "a");
     if (fptr == NULL)
     {
@@ -54,8 +54,8 @@ static int daemon_work()
     while (1)
     {
 
-        //use appropriate location if you are using MacOS or Linux
-        //TODO: Change to appropriate path
+        // Use appropriate location if you are using MacOS or Linux
+        // TODO: Change to appropriate path
         fptr = fopen(path, "a");
 
         if (fptr == NULL)

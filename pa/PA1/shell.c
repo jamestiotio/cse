@@ -410,12 +410,13 @@ char **shellTokenizeInput(char *line)
  */
 void shellLoop(void)
 {
-  //instantiate local variables
+  // Instantiate local variables
   char *line;  // to accept the line of string from user
   char **args; // to tokenize them as arguments separated by spaces
   int status;  // to tell the shell program whether to terminate shell or not
+
   /** TASK 5 **/
-  //write a loop where you do the following: 
+  // Write a loop where you do the following: 
 
   // 1. print the message prompt
   // 2. clear the buffer and move the output to the console using fflush
@@ -427,38 +428,31 @@ void shellLoop(void)
   // 7. free memory location containing char* to the first letter of each word in the input string
   // 8. check if shellExecuteInput returns 1. If yes, loop back to Step 1 and prompt user with new input. Otherwise, exit the shell. 
 
-  //call shellReadLine that returns char pointer
-
+  // A do-while loop is much more performant than a recursive solution
+  // It is also the selected method of implementation used by general standard popular shells (like Bash and Zsh)
+  // For further reference:
+  // - https://brennan.io/2015/01/16/write-a-shell-in-c/
+  // - https://git.savannah.gnu.org/cgit/bash.git/tree/shell.c#n447
+  // - https://sourceforge.net/p/zsh/code/ci/master/tree/Src/init.c#l1738
+  // - https://sourceforge.net/p/zsh/code/ci/master/tree/Src/init.c#l1794
+  do {
     printf("CSEShell> ");
-    line = shellReadLine();
-    printf("Type: %s \n", line);
+    fflush(stdout);
+    fflush(stdin);
+    line = shellReadLine(); // Call shellReadLine that returns char pointer
     args = shellTokenizeInput(line);
     status = shellExecuteInput(args);
-    free(args);
+
     free(line);
-    //printf("This is the value of status %d end \n",status);
-    if (status == 1){
-      printf("Continue loop \n");
-      shellLoop();
-      //added temporarily to free the stack
-      free(line);
-      free(args);
-    }
-    exit(1);
+    free(args);
+  } while (status);
 }
-
-
 
 int main(int argc, char **argv)
 {
-  
- printf("Shell Run successful. Running now: \n");
- 
- // Run command loop
- shellLoop();
- return 0;
+  printf("Shell Run successful. Running now: \n");
 
- 
+  // Run command loop
+  shellLoop();
+  return 0;
 }
-
-
