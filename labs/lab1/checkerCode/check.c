@@ -52,6 +52,7 @@ int main()
             }
             
         }
+        fclose(fp);
         i++;
     }
     printf("You scored %d/%d\n", correct, TOTAL_TEST);

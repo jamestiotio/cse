@@ -38,6 +38,7 @@ int main()
         }
 
         fclose(opened_file);
+        free(filename);
     }
     return 0;
 }

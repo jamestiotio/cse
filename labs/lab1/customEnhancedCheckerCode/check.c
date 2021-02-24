@@ -37,6 +37,7 @@ int main()
             }
         }
         fclose(opened_file);
+        free(filename);
         sprintf(answer, "Final results: sum -- %d, odd -- %d, min -- %d, max -- %d, total task -- %d\n", sum, odd, min, max, total);
         answers[k] = answer;
     }
@@ -88,6 +89,7 @@ int main()
                     printf("Wrong answer\n");
                 }
             }
+            fclose(fp);
             i++;
         }
     }
