@@ -8,7 +8,7 @@ int main()
     int correct = 0;
     char *answer_0 = "Final results: sum -- 3, odd -- 1, min -- 3, max -- 3, total task -- 1\n";
     char *answer_1 = "Final results: sum -- 6, odd -- 2, min -- 1, max -- 3, total task -- 3\n";
-    char *answers[2] = {answer_0, answer_1}; //content is the starting address of each answer string
+    char *answers[2] = {answer_0, answer_1}; // Content is the starting address of each answer string
 
     int i = 0;
     char command[128];
@@ -33,7 +33,7 @@ int main()
 
         FILE *fp = fopen("answer.txt", "r+");
 
-        //read the first line which is the answer
+        // Read the first line which is the answer
         char *line = NULL;
 
         size_t length = 0;
