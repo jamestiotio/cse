@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
     //unlink all semaphores before exiting process
     int sem_close_status = sem_unlink("semglobaldata");
     if (sem_close_status == 0){
-        printf("Semaphore globaldata closes succesfully.\n");
+        printf("Semaphore globaldata closes successfully.\n");
     }
     else{
         printf("Semaphore globaldata fails to close.\n");
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
         sprintf(sem_name, "semjobs%d", i);
         sem_close_status = sem_unlink(sem_name);
         if (sem_close_status == 0){
-             printf("Semaphore jobs %d closes succesfully.\n", i);
+             printf("Semaphore jobs %d closes successfully.\n", i);
         }
         else{
             printf("Semaphore jobs %d fails to close.\n", i);

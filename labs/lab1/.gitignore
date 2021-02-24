@@ -1,1 +1,9 @@
 .DS_Store
+Thumbs.db
+
+out
+./checkerCode/checkout
+./customEnhancedCheckerCode/checkout
+./customEnhancedCheckerCode/generate
+
+./customEnhancedCheckerCode/input*

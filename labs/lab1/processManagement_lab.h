@@ -43,7 +43,7 @@ typedef struct job {
     int task_status;    // if task_status == -1 : termination job
                         // if task_status == 1 : new job available
                         // if task_status == 0 : no job available or job done. Init task_status to this value. 
-}job;
+} job;
 
 //shared_nemory global_jobs to share to child process
 int ShmID_jobs;
