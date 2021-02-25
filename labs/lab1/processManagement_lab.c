@@ -134,7 +134,7 @@ void setup() {
     shmPTR_jobs_buffer->task_status = 0;
 
     for (int i = 0; i < number_of_processes; i++) {
-        // We use 16 bytes because of these (follow the same method as testmain_todo1; minimum is 8 bytes to avoid occasional segmentation faults):
+        // We use 16 bytes because of these (follow the same method as testmain_todo1; minimum is 8 bytes to avoid occasional segmentation faults due to attempted illegal RAM's protected memory access):
         // - https://stackoverflow.com/a/40679845
         // - https://stackoverflow.com/a/17298238
         // Employ proper non-sloppy memory management techniques here
