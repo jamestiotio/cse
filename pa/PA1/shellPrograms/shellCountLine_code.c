@@ -28,15 +28,16 @@ int shellCountLine_code(char **args)
     }
 
     int line_count = 0;
-    ssize_t line_size;
     size_t bufsize = SHELL_BUFFERSIZE;
-    char* line = (char*) malloc(sizeof(char) * bufsize);    
+    char* line = (char*) malloc(sizeof(char) * bufsize);
 
-    line_size = getline(&line, &bufsize, fp);
+    if (line == NULL) {
+        printf("Error in allocating memory for line buffer. Exiting...\n");
+        return 1;
+    }
 
-    while (line_size != -1) {
+    while (getline(&line, &bufsize, fp) != -1) {
         line_count++;
-        line_size = getline(&line, &bufsize, fp);
     }
 
     free(line);
