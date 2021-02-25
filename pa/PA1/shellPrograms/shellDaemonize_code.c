@@ -18,7 +18,6 @@ char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/202
 /*This function summons a daemon process out of the current process*/
 static int create_daemon()
 {
-
     /** TASK 7 **/
     // Incantation on creating a daemon with fork() twice
 

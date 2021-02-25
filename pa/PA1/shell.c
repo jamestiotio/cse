@@ -280,7 +280,6 @@ int shellUsage(char **args)
 int shellExecuteInput(char **args)
 {
   /** TASK 3 **/
-
   // 1. Check if args[0] is NULL. If it is, an empty command is entered, return 1
   // 2. Otherwise, check if args[0] is in any of our builtin_commands, and that it is NOT cd, help, exit, or usage.
   // 3. If conditions in (2) are satisfied, perform fork(). Check if fork() is successful.
@@ -344,7 +343,7 @@ int shellExecuteInput(char **args)
 char *shellReadLine(void)
 {
   /** TASK 1 **/
-  // read one line from stdin using getline()
+  // Read one line from stdin using getline()
 
   // 1. Allocate a memory space to contain the string of input from stdin using malloc. Malloc should return a char* that persists even after this function terminates.
   // 2. Check that the char* returned by malloc is not NULL

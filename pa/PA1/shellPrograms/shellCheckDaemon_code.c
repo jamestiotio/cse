@@ -3,7 +3,6 @@
 /*  A program that prints how many summoned daemons are currently alive */
 int shellCheckDaemon_code()
 {
-
    /** TASK 8 **/
    //Create a command that trawl through output of ps -efj and contains "summond"
    char *command = malloc(sizeof(char) * 256);
