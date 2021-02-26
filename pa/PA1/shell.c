@@ -437,7 +437,7 @@ void shellLoop(void)
   do {
     printf("CSEShell> ");
     fflush(stdout);
-    fflush(stdin);
+    // fflush(stdin); // This is undefined behaviour, do not use this!
     line = shellReadLine(); // Call shellReadLine that returns char pointer
     args = shellTokenizeInput(line);
     status = shellExecuteInput(args);
