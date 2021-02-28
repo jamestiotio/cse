@@ -59,7 +59,8 @@ void initBank(int *resources, int m, int n) {
 	maximum = mallocIntMatrix(n, m);
 	
 	// TODO: initialize the numberOfCustomers and numberOfResources
-	
+	int numberOfCustomers = n;
+	int numberOfResources = m;
 	// TODO: initialize the available vector
 
 }
