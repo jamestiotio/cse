@@ -62,7 +62,11 @@ void initBank(int *resources, int m, int n) {
 	int numberOfCustomers = n;
 	int numberOfResources = m;
 	// TODO: initialize the available vector
-
+	//available allocates an integer vector 
+	printf("above initialisation is successful \n");
+	for(int i = 0; i<numberOfResources; i++){
+		available[i] = resources[i];
+	}
 }
 
 /**
