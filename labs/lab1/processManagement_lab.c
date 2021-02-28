@@ -131,6 +131,7 @@ void setup() {
         exit(EXIT_FAILURE);
     }
 
+    // This is actually not needed since global variables have default values (0 for int)
     shmPTR_jobs_buffer->task_status = 0;
 
     for (int i = 0; i < number_of_processes; i++) {
