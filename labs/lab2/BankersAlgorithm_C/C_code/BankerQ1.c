@@ -64,8 +64,12 @@ void initBank(int *resources, int m, int n) {
 	// TODO: initialize the available vector
 	//available allocates an integer vector 
 	printf("above initialisation is successful \n");
+	printf("The number of customers is %d \n",n);
+	printf("the number of resources available is %d \n",m);
+
 	for(int i = 0; i<numberOfResources; i++){
 		available[i] = resources[i];
+		printf("%i",available[i]);
 	}
 }
 
@@ -134,7 +138,11 @@ void printState() {
  */
 void setMaximumDemand(int customerIndex, int *maximumDemand) {
 	// TODO: add customer, update maximum and need
-
+	for(int i = 0;i<numberOfResources ;i++){
+		//update the max and need respectively
+		printf("entered the for loop \n");
+		
+	}
 }
 
 /**
