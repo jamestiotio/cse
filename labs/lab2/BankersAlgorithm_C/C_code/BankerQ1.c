@@ -183,8 +183,10 @@ int checkSafe(int customerIndex, int *request) {
 int requestResources(int customerIndex, int *request) {
 	// TODO: print the request
 	printf("Customer %d requesting\n", customerIndex);
+	
 	for (int i=0; i<numberOfResources; i++){
 		allocation[customerIndex][i] += request[i];
+		need[customerIndex][i] -= allocation[customerIndex][i];
 		printf("%d ", request[i]); // Leave a space between each request 
 		// TODO: judge if request larger than need
 		if(request[i]> need[customerIndex][i]){
@@ -219,9 +221,12 @@ void releaseResources(int customerIndex, int *release) {
 	//need < work, the work absorb the allocate resources
 	//work will increase 
 	for(int i = 0; i<numberOfResources;i++){
-		printf("The release for customer %d is %d\n",customerIndex,release[i]);
-		allocation[customerIndex][i] -= release[i];
-		
+		//printf("The release for customer %d is %d\n",customerIndex,release[i]);
+		allocation[customerIndex][i] += release[i];
+		available[i] += release[i];
+		//maximum[customerIndex][i] += release[i]; 
+		//need[customerIndex][i] -= release[i];
+		need[customerIndex][i] -= release[i];
 	}
 	
 }
