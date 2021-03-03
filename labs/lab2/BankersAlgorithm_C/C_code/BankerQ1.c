@@ -60,8 +60,8 @@ void initBank(int *resources, int m, int n) {
 	maximum = mallocIntMatrix(n, m);
 	
 	// TODO: initialize the numberOfCustomers and numberOfResources
-	int numberOfCustomers = n;
-	int numberOfResources = m;
+	numberOfCustomers = n;
+	numberOfResources = m;
 	// TODO: initialize the available vector
 	//available allocates an integer vector 
 	printf("above initialisation is successful \n");
@@ -70,7 +70,7 @@ void initBank(int *resources, int m, int n) {
 
 	for(int i = 0; i<numberOfResources; i++){
 		available[i] = resources[i];
-		printf("%i",available[i]);
+		printf("%i\n",available[i]);
 	}
 }
 
@@ -144,9 +144,11 @@ void setMaximumDemand(int customerIndex, int *maximumDemand) {
 	for(int i = 0;i<numberOfResources ;i++){
 		//update the max and need respectively
 		printf("the number of resources available for process j is %d \n",i);
+
 		maximum[customerIndex][i] = maximumDemand[i];
 		need[customerIndex][i]= maximum[customerIndex][i];
-		printf("the need is %d",need[customerIndex][i]);
+		
+		printf("the need is %d\n",need[customerIndex][i]);
 	}
 }
 
@@ -182,15 +184,15 @@ int requestResources(int customerIndex, int *request) {
 	// TODO: print the request
 	printf("Customer %d requesting\n", customerIndex);
 	for (int i=0; i<numberOfResources; i++){
+		allocation[customerIndex][i] += request[i];
 		printf("%d ", request[i]); // Leave a space between each request 
-
 		// TODO: judge if request larger than need
 		if(request[i]> need[customerIndex][i]){
 			return 0;
 		}
 
 		// TODO: judge if request larger than available
-		if(request[i]>available){
+		if(request[i] > available[i]){
 			return 0;
 		}
 	}
@@ -209,9 +211,18 @@ int requestResources(int customerIndex, int *request) {
  * @param release        An array of the release count for each resource.
  */
 void releaseResources(int customerIndex, int *release) {
-	// TODO: print the release
+	// TODO: print the release (already done)
 	printf("Customer %d releasing\n", customerIndex);
+
 	// TODO: deal with release (:For simplicity, we do not judge the release request, just update directly)
+	//no if statement
+	//need < work, the work absorb the allocate resources
+	//work will increase 
+	for(int i = 0; i<numberOfResources;i++){
+		printf("The release for customer %d is %d\n",customerIndex,release[i]);
+		allocation[customerIndex][i] -= release[i];
+		
+	}
 	
 }
 
@@ -278,6 +289,7 @@ void runFile(const char * filename) {
 					resources[j] = atoi(strtok(j == 0 ? token : NULL, " "));
 				}
 				requestResources(customerIndex, resources);
+				//printf("0");
 				free(resources);
 			} else if (strcmp(token, "f") == 0) {
 				int customerIndex = atoi(strtok(NULL, ","));	
