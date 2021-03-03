@@ -2,6 +2,7 @@
  * CSE lab project 2 -- C version
  * 
 **/
+/*reference: https://www.geeksforgeeks.org/bankers-algorithm-in-operating-system-2/*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -135,13 +136,17 @@ void printState() {
  * Sets the maximum number of demand of each resource for a customer.
  * @param customerIndex  The customer's index (0-indexed).
  * @param maximumDemand  An array of the maximum demanded count for each resource.
+ * int **maximum;        // the maximum demand of each customer
+ * int **need;           // the remaining needs of each customer
  */
 void setMaximumDemand(int customerIndex, int *maximumDemand) {
 	// TODO: add customer, update maximum and need
 	for(int i = 0;i<numberOfResources ;i++){
 		//update the max and need respectively
-		printf("entered the for loop \n");
-		
+		printf("the number of resources available for process j is %d \n",i);
+		maximum[customerIndex][i] = maximumDemand[i];
+		need[customerIndex][i]= maximum[customerIndex][i];
+		printf("the need is %d",need[customerIndex][i]);
 	}
 }
 
