@@ -164,7 +164,6 @@ int checkSafe(int customerIndex, int *request) {
 	int **tempAllocation = mallocIntMatrix(numberOfCustomers, numberOfResources);
 	
 	// TODO: copy the bank's state to the temporary memory and update it with the request.
-	
 	// TODO: check if the new state is safe
 
 	return 1;
@@ -175,20 +174,27 @@ int checkSafe(int customerIndex, int *request) {
  * If the request leave the bank in a safe state, it is carried out.
  * @param customerIndex  The customer's index (0-indexed).
  * @param request        An array of the requested count for each resource.
+ * int *available;       // the available amount of each resource
  * @return 1 if the requested resources can be loaned, else 0.
+ * remember to use the customer as the process
  */
 int requestResources(int customerIndex, int *request) {
 	// TODO: print the request
 	printf("Customer %d requesting\n", customerIndex);
 	for (int i=0; i<numberOfResources; i++){
 		printf("%d ", request[i]); // Leave a space between each request 
+
+		// TODO: judge if request larger than need
+		if(request[i]> need[customerIndex][i]){
+			return 0;
+		}
+
+		// TODO: judge if request larger than available
+		if(request[i]>available){
+			return 0;
+		}
 	}
 	printf("\n"); // Leave a line after each customer 
-	
-	
-	// TODO: judge if request larger than need
-	
-	// TODO: judge if request larger than available
 	
 	// TODO: judge if the new state is safe if grants this request (for question 2)
 	
