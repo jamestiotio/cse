@@ -70,7 +70,7 @@ void initBank(int *resources, int m, int n) {
 		available[i] = resources[i];
 
 		//COMMENT this statement out
-		printf("The available amount for resource %d is %d\n",i,available[i]);
+		//printf("The available amount for resource %d is %d\n",i,available[i]);
 	}
 }
 
@@ -144,8 +144,8 @@ void setMaximumDemand(int customerIndex, int *maximumDemand) {
 		maximum[customerIndex][i] = maximumDemand[i];
 		need[customerIndex][i] = maximumDemand[i];
 		//COMMENT out these print statement 
-		printf("The maximum for resource %d is %d\n",i,maximum[customerIndex][i]);
-		printf("The need for resource %d is %d\n",i,need[customerIndex][i]);
+		//printf("The maximum for resource %d is %d\n",i,maximum[customerIndex][i]);
+		//printf("The need for resource %d is %d\n",i,need[customerIndex][i]);
 	}
 }
 
@@ -157,15 +157,75 @@ void setMaximumDemand(int customerIndex, int *maximumDemand) {
  *         safe state, else 0
  */
 int checkSafe(int customerIndex, int *request) {
+	/*
+	Available[i] : the available instances of resource i 
+	Max[i][j] : maximum demand of process i for resource j instances
+	Allocation[i][j] : current allocation of process i with resource j instances
+	Need[i][j] = Max[i][j] - Allocation[i][j]
+	*/
 	// Allocate temporary memory to copy the bank state.
+	int *temp_avail;
 	int *work = mallocIntVector(numberOfResources);
-	int **tempNeed = mallocIntMatrix(numberOfCustomers, numberOfResources);
-	int **tempAllocation = mallocIntMatrix(numberOfCustomers, numberOfResources);
-	
-	// TODO: copy the bank's state to the temporary memory and update it with the request.
-	
-	// TODO: check if the new state is safe
 
+	//num of customers by the number of resources
+	int **tempNeed = mallocIntMatrix(numberOfCustomers, numberOfResources);
+
+	//Allocation[i][j] : current allocation of process i with resource j instances
+	int **tempAllocation = mallocIntMatrix(numberOfCustomers, numberOfResources);
+
+	//use the finish resources 
+	int *finish = mallocIntVector(numberOfCustomers);
+	
+	//initialise the finish array to be false
+	for(int i = 0; i<numberOfCustomers;i++){
+		finish[i] = 0;
+	}
+	//COMMENT out this print statement
+	//printf("The finish array has been initialised as false");
+	// TODO: copy the bank's state to the temporary memory and update it with the request.
+	for(int i = 0; i<numberOfResources;i++){
+		temp_avail[i] = available[i] - request[i];
+		work = temp_avail;
+		 for(int j = 0; j < numberOfCustomers; j++){
+
+			 //make sure to copy everything over cuz u wanna protect.
+			 tempNeed[j][i] = need[j][i];
+			 tempAllocation[j][i] = allocation[j][i];
+
+		 }
+		 tempNeed[customerIndex][i] -= request[i];
+		 tempAllocation[customerIndex][i] += request[i];
+		 //COMMENT out 
+		 //printf("the allocation of customer %d is %d\n",customerIndex,tempAllocation[customerIndex][i]);
+	}
+
+	int possible;
+
+	possible = 1;
+
+	while(possible){
+		possible = 0;
+		for(int j=0;j<numberOfCustomers;j++){
+			for(int i=0;i<numberOfResources;i++){
+				if(finish[j]== 0 && tempNeed[j][i]<=work[i]){
+					possible = 1;
+					work[i] += tempAllocation[j][i];
+					finish[j] = 1;
+			}
+			}
+		}
+	}
+	/*Pretend that the request is granted, make a copy of the available, need, 
+	and allocation matrix that serves this supposed request 
+Check whether it leads to the safe state 
+Returns True/False accordingly 
+*/
+	// TODO: check if the new state is safe
+	for(int i = 0; i <numberOfResources;i++){
+		if(finish[i]==0){
+			return 0;
+		}
+	}
 	return 1;
 }
 
@@ -181,8 +241,8 @@ int requestResources(int customerIndex, int *request) {
 	printf("Customer %d requesting\n", customerIndex);
 	for (int i=0; i<numberOfResources; i++){
 		printf("%d ", request[i]); // Leave a space between each request 
-		allocation[customerIndex][i] += request[i];
-		need[customerIndex][i] = maximum[customerIndex][i] - allocation[customerIndex][i];
+		//allocation[customerIndex][i] += request[i];
+		//need[customerIndex][i] = maximum[customerIndex][i] - allocation[customerIndex][i];
 		// TODO: judge if request larger than need
 		if(request[i]>need[customerIndex][i]){
 			return 0;
@@ -196,9 +256,15 @@ int requestResources(int customerIndex, int *request) {
 	
 
 	// TODO: judge if the new state is safe if grants this request (for question 2)
-	
+	if(checkSafe(customerIndex,request)!= 1){
+		return 0;
+	}
 	// TODO: request is granted, update state
-	
+	for(int i = 0; i<numberOfResources;i++){
+		allocation[customerIndex][i] += request[i];
+		need[customerIndex][i] -= request[i];
+		available[i] -= request[i];
+		}
 	return 1;
 }
 
