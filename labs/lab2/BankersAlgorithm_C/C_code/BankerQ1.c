@@ -181,7 +181,8 @@ int requestResources(int customerIndex, int *request) {
 	printf("Customer %d requesting\n", customerIndex);
 	for (int i=0; i<numberOfResources; i++){
 		printf("%d ", request[i]); // Leave a space between each request 
-
+		allocation[customerIndex][i] += request[i];
+		need[customerIndex][i] = maximum[customerIndex][i] - allocation[customerIndex][i];
 		// TODO: judge if request larger than need
 		if(request[i]>need[customerIndex][i]){
 			return 0;
@@ -210,7 +211,14 @@ void releaseResources(int customerIndex, int *release) {
 	// TODO: print the release
 	printf("Customer %d releasing\n", customerIndex);
 	// TODO: deal with release (:For simplicity, we do not judge the release request, just update directly)
-	
+	//update the resources 
+	//work = work + allocation at process i; available aka
+	for(int i = 0; i<numberOfResources;i++){
+		available[i] = available[i]+release[i];
+		allocation[customerIndex][i] -= release[i];
+		//just sub into the equation given in notes
+		need[customerIndex][i] = need[customerIndex][i] + release[i];
+	}
 }
 
 /**
