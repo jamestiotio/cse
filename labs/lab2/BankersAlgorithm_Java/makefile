@@ -3,15 +3,16 @@ all: Banker.java TestBankQ1.java TestBankQ2.java
 	gcc -o checkq1 checkerQ1.c
 	gcc -o checkq2 checkerQ2.c
 
-test: checkq1 checkq2 Banker.class TestBankQ1.class TestBankQ2.class
+testq1: checkq1 Banker.class TestBankQ1.class
 	./checkq1
+
+testq2: checkq2 Banker.class  TestBankQ2.class
 	./checkq2
 
-
 clean:
-	rm checkq1
-	rm checkq2
-	rm Banker.class
-	rm TestBankQ1.class
-	rm TestBankQ2.class
-	rm answer.txt
+	rm -f checkq1
+	rm -f checkq2
+	rm -f Banker.class
+	rm -f TestBankQ1.class
+	rm -f TestBankQ2.class
+	rm -f answer.txt

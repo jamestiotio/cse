@@ -18,15 +18,20 @@ public class Banker {
 	 * @param resources          An array of the available count for each resource.
 	 * @param numberOfCustomers  The number of customers.
 	 */
-	public Banker (int[] resources, int numberOfCustomers) {
-		// TODO: set the number of resources
+	public Banker(int[] resources, int numberOfCustomers) {
+		// Set the number of resources
+		this.numberOfResources = resources.length;
 
-		// TODO: set the number of customers
+		// Set the number of customers
+		this.numberOfCustomers = numberOfCustomers;
 
-		// TODO: set the value of bank resources to available
+		// Set the value of bank resources to available
+		this.available = resources;
 
-		// TODO: set the array size for maximum, allocation, and need
-
+		// Set the array size for maximum, allocation, and need
+		this.maximum = new int[this.numberOfCustomers][this.numberOfResources];
+		this.allocation = new int[this.numberOfCustomers][this.numberOfResources];
+		this.need = new int[this.numberOfCustomers][this.numberOfResources];
 	}
 
 	/**
@@ -35,8 +40,11 @@ public class Banker {
 	 * @param maximumDemand  An array of the maximum demanded count for each resource.
 	 */
 	public void setMaximumDemand(int customerIndex, int[] maximumDemand) {
-		// TODO: add customer, update maximum and need
-
+		// Add customer, update maximum and need
+		this.maximum[customerIndex] = maximumDemand;
+		for (int i = 0; i < this.numberOfResources; i++) { // Need is a n by m matrix (n rows/customers, m columns/resources)
+			this.need[customerIndex][i] = this.maximum[customerIndex][i] - this.allocation[customerIndex][i];
+		}
 	}
 
 	/**
@@ -77,18 +85,26 @@ public class Banker {
 	 * @return true if the requested resources can be loaned, else false.
 	 */
 	public synchronized boolean requestResources(int customerIndex, int[] request) {
-		// TODO: print the request
+		// Print the request
 		System.out.println("Customer " + customerIndex + " requesting");
         System.out.println(Arrays.toString(request));
-		// TODO: check if request larger than need
-		
-		// TODO: check if request larger than available
-		
-		// TODO: check if the state is safe or not
-		
-		// TODO: if it is safe, allocate the resources to customer customerNumber
-		
-		return true;
+
+		// Check if request larger than need or available
+		for (int i = 0; i < this.numberOfResources; i++) {
+			if ((request[i] > this.need[customerIndex][i]) || (request[i] > this.available[i])) return false;
+		}
+
+		// Check if the state is safe or not
+		if (this.checkSafe(customerIndex, request)) {
+			// If it is safe, allocate the resources to customer customerNumber
+			for (int i = 0; i < this.numberOfResources; i++) {
+				this.available[i] -= request[i];
+				this.allocation[customerIndex][i] += request[i];
+				this.need[customerIndex][i] -= request[i];
+			}
+
+			return true;
+		} else return false;
 	}
 
 	/**
@@ -97,13 +113,16 @@ public class Banker {
 	 * @param release        An array of the release count for each resource.
 	 */
 	public synchronized void releaseResources(int customerIndex, int[] release) {
-		// TODO: print the release
+		// Print the release
 		System.out.println("Customer " + customerIndex + " releasing");
 		System.out.println(Arrays.toString(release));
-		
-		// TODO: release the resources from customer customerNumber
-		
 
+		// Release the resources from customer customerNumber
+		for (int i = 0; i < this.numberOfResources; i++) {
+			this.available[i] += release[i];
+			this.allocation[customerIndex][i] -= release[i];
+			this.need[customerIndex][i] += release[i];
+		}
 	}
 
 	/**
@@ -114,8 +133,60 @@ public class Banker {
 	 *         safe state, else false
 	 */
 	private synchronized boolean checkSafe(int customerIndex, int[] request) {
-		// TODO: check if the state is safe
-		
+		// Check if the state is safe
+
+		// Copy the available, need and allocation arrays
+		int[] tempAvailable = this.available.clone();
+		int[][] tempNeed = this.need.clone();
+		int[][] tempAllocation = this.allocation.clone();
+
+		// Initialize finish vector (defaults to false)
+		boolean[] finish = new boolean[this.numberOfCustomers];
+
+		// Initialize a boolean flag
+		boolean possible = true;
+
+		for (int i = 0; i < this.numberOfResources; i++) {
+			tempAvailable[i] -= request[i];
+			tempNeed[customerIndex][i] -= request[i];
+			tempAllocation[customerIndex][i] += request[i];
+		}
+
+		// Initialize work vector
+		int[] work = tempAvailable.clone();
+
+		while (possible) {
+			possible = false;
+			for (int i = 0; i < this.numberOfCustomers; i++) {
+				boolean needDoesNotExceedWork = true;
+
+				for (int j = 0; j < this.numberOfResources; j++) {
+					if (tempNeed[i][j] > work[j]) needDoesNotExceedWork = false;
+				}
+
+				if (!finish[i] && needDoesNotExceedWork) {
+					possible = true;
+
+					for (int j = 0; j < this.numberOfResources; j++) {
+						work[j] += tempAllocation[i][j];
+					}
+
+					finish[i] = true;
+				}
+			}
+		}
+
+		// Undo the temporary changes that have been made to tempAllocation and tempNeed
+		for (int i = 0; i < this.numberOfResources; i++) {
+			tempAllocation[customerIndex][i] -= request[i];
+			tempNeed[customerIndex][i] += request[i];
+		}
+
+		// Check if all of the entries in the finish vector are true
+		for (int i = 0; i < this.numberOfCustomers; i++) {
+			if (!finish[i]) return false;
+		}
+
 		return true;
 	}
 
@@ -125,7 +196,6 @@ public class Banker {
 	 * @param filename  The name of the file.
 	 */
 	public static void runFile(String filename) {
-
 		try {
 			BufferedReader fileReader = new BufferedReader(new FileReader(filename));
 
@@ -226,5 +296,4 @@ public class Banker {
 			runFile(args[0]);
 		}
 	}
-
 }
