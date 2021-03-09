@@ -14,6 +14,7 @@
 
 // TODO: change to appropriate path
 char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/2020/PA1 Makeshell Daemon/PA1/logfile_test.txt";
+//char *path = "/Users/caramelmelmel"
 
 /*This function summons a daemon process out of the current process*/
 static int create_daemon()
@@ -25,11 +26,39 @@ static int create_daemon()
     // 2. Close parent with exit(1)
     // 3. On child process (this is intermediate process), call setsid() so that the child becomes session leader to lose the controlling TTY
     // 4. Ignore SIGCHLD, SIGHUP
+
     // 5. Fork() again, parent (the intermediate) process terminates
+
     // 6. Child process (the daemon) set new file permissions using umask(0). Daemon's PPID at this point is 1 (the init)
     // 7. Change working directory to root
     // 8. Close all open file descriptors using sysconf(_SC_OPEN_MAX) and redirect fd 0,1,2 to /dev/null
     // 9. Return to main
+    pid_t pid = fork();
+
+    //child process 
+    if(pid == 0){
+        //TOOO 3 CLEAR NOW ?! I caught you not sleeping at 3 am 
+        setsid();
+
+        //TODO 4 SEE HOW MUCH IM READING HMPH
+        signal(SIGCHLD, SIG_IGN);
+        signal(SIGHUP, SIG_IGN);
+
+        //TODO 5 
+        
+
+    }
+    else if(pid > 0){
+        //TO INDICATE TO YOU this is part 2
+        printf("closing the parent process right now");
+        exit(1);
+    }
+
+    else{
+        fprintf(stderr,"Fork has failed, exiting now");
+        //exit with error
+        return 1;
+    }
 
     return 1;
 }
