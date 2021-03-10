@@ -1,4 +1,4 @@
-//THIS FILE IS TO TEST UNMASK AS IT WAS not working on my system 
+// THIS FILE IS TO TEST UNMASK AS IT WAS not working on my system 
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -20,7 +20,7 @@
 #include <fcntl.h>
 #include <sys/resource.h>
 
-int main(){
+int main() {
     umask(0);
     printf("Managed to set file permissions to 0777");
     return 1;

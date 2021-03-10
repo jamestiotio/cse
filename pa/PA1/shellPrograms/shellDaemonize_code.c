@@ -2,6 +2,7 @@
  * daemonize.c
  * This example daemonizes a process, writes a few log messages,
  * sleeps 60 seconds and terminates afterwards.
+ * NOTE: Technically, this violates the traditional daemon definition since this terminates after a certain period of time, but we don't really care for the sake of this assignment.
  */
 
 // To test compile: gcc Daemonize.c -o summond
@@ -12,9 +13,9 @@
 
 #include "shellPrograms.h"
 
-// TODO: change to appropriate path
-//char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/2020/PA1 Makeshell Daemon/PA1/logfile_test.txt";
-char *path = "/Users/caramelmel/cse/pa/PA1/systemlog.txt";
+// TODO: Change to appropriate path
+// char *path = "/Users/natalie_agus/Dropbox/50.005 Computer System Engineering/2020/PA1 Makeshell Daemon/PA1/logfile_test.txt";
+char *path = "";
 
 /*This function summons a daemon process out of the current process*/
 static int create_daemon()
@@ -34,60 +35,59 @@ static int create_daemon()
     // 9. Return to main
     pid_t pid = fork();
 
-    //child process 
-    if(pid == 0){
-        //TOOO 3 CLEAR NOW ?! I caught you not sleeping at 3 am 
-        setsid();
+    // Child process
+    if (pid == 0) {
+        // Step 3
+        if (setsid() < 0) exit(EXIT_FAILURE);
 
-        //TODO 4 SEE HOW MUCH IM READING HMPH
+        // Step 4
         signal(SIGCHLD, SIG_IGN);
         signal(SIGHUP, SIG_IGN);
 
-        //TODO 5 
+        // Step 5
         pid_t pid_2 = fork();
 
-        if(pid_2< 0 ){
-            fprintf(stderr,"Fork has failed exiting now\n");
-            return 1;
+        if (pid_2 < 0) {
+            fprintf(stderr,"Fork has failed, exiting now...\n");
+            exit(EXIT_FAILURE);
         }
-        else if(pid_2 > 0){
-            //printf("Closing the parent process right now\n");
+        else if (pid_2 > 0) {
+            // printf("Closing the parent process right now...\n");
             exit(1);
         }
-        else if (pid_2 == 0){
-            //child process daemon
-            //set file mode and create task
-            //DEBUGGING NEEDED: the error on the compiler 
+        else if (pid_2 == 0) {
+            // Child process daemon
+            // Set file mode and create task
             umask(0);
 
-            //THIS IS TO TEST FOR DEBUGGING AS UNMASK THREW AN ERROR ON MY COMPILER
-            //printf("compiled here\n");
+            // printf("Compiled here...\n");
 
-            //TASK 7
+            // Step 7
             chdir("/");
             
-            //TASK 8 
-            //loop through the filelines 
-            for(int i = sysconf(_SC_OPEN_MAX);i>=0;i--){
+            // Step 8
+            // Loop through the filelines
+            for (int i = sysconf(_SC_OPEN_MAX); i>=0; i--) {
                 close(i);
             }
+
             int fd0 = open("/dev/null", O_RDWR);
             int fd1 = dup(0);
             int fd2 = dup(0);
         }
 
     }
-    else if(pid > 0){
-        //TO INDICATE TO YOU this is part 2
-        //printf("closing the parent process right now\n");
+    else if (pid > 0) {
+        // printf("Closing the parent process right now...\n");
         exit(1);
     }
 
-    else{
-        fprintf(stderr,"Fork has failed, exiting now\n");
-        //exit with error
-        return 1;
+    else {
+        fprintf(stderr,"Fork has failed, exiting now...\n");
+        // Exit with error
+        exit(EXIT_FAILURE);
     }
+
     return 1;
 }
 
@@ -135,9 +135,18 @@ static int daemon_work()
 
 int main(int argc, char **args)
 {
+    // Do a custom input to set path on runtime
+    // Take note that getline() is POSIX-specific
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read = 0;
+    puts("Please specify the absolute path of the file to be used as a log file: ");
+    read = getline(&line, &len, stdin);
+    path = line;
+
     create_daemon();
 
-    //printf("created daemon correctly\n");
+    // printf("Created daemon correctly.\n");
     /* Open the log file */
     openlog("customdaemon", LOG_PID, LOG_DAEMON);
     syslog(LOG_NOTICE, "Daemon started.");
