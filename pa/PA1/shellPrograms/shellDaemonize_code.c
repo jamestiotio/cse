@@ -51,7 +51,7 @@ static int create_daemon()
             return 1;
         }
         else if(pid_2 > 0){
-            printf("Closing the parent process right now\n");
+            //printf("Closing the parent process right now\n");
             exit(1);
         }
         else if (pid_2 == 0){
@@ -79,7 +79,7 @@ static int create_daemon()
     }
     else if(pid > 0){
         //TO INDICATE TO YOU this is part 2
-        printf("closing the parent process right now\n");
+        //printf("closing the parent process right now\n");
         exit(1);
     }
 
