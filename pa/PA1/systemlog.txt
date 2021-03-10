@@ -1,0 +1,22 @@
+78182 with FD 3
+PID 78182 Daemon writing line 0 to the file.  
+PID 78182 Daemon writing line 1 to the file.  
+PID 78182 Daemon writing line 2 to the file.  
+PID 78182 Daemon writing line 3 to the file.  
+PID 78182 Daemon writing line 4 to the file.  
+PID 78182 Daemon writing line 5 to the file.  
+78289 with FD 3
+PID 78289 Daemon writing line 0 to the file.  
+PID 78182 Daemon writing line 6 to the file.  
+PID 78289 Daemon writing line 1 to the file.  
+PID 78182 Daemon writing line 7 to the file.  
+PID 78289 Daemon writing line 2 to the file.  
+PID 78182 Daemon writing line 8 to the file.  
+PID 78289 Daemon writing line 3 to the file.  
+PID 78182 Daemon writing line 9 to the file.  
+PID 78289 Daemon writing line 4 to the file.  
+PID 78289 Daemon writing line 5 to the file.  
+PID 78289 Daemon writing line 6 to the file.  
+PID 78289 Daemon writing line 7 to the file.  
+PID 78289 Daemon writing line 8 to the file.  
+PID 78289 Daemon writing line 9 to the file.  
