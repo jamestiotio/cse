@@ -273,3 +273,24 @@ PID 82397 Daemon writing line 8 to the file.
 PID 82188 Daemon writing line 9 to the file.  
 PID 82214 Daemon writing line 9 to the file.  
 PID 82397 Daemon writing line 9 to the file.  
+59734 with FD 3
+PID 59734 Daemon writing line 0 to the file.  
+59831 with FD 3
+PID 59831 Daemon writing line 0 to the file.  
+59918 with FD 3
+PID 59918 Daemon writing line 0 to the file.  
+PID 59734 Daemon writing line 1 to the file.  
+PID 59831 Daemon writing line 1 to the file.  
+PID 59918 Daemon writing line 1 to the file.  
+PID 59734 Daemon writing line 2 to the file.  
+PID 59831 Daemon writing line 2 to the file.  
+PID 59918 Daemon writing line 2 to the file.  
+PID 59734 Daemon writing line 3 to the file.  
+PID 59831 Daemon writing line 3 to the file.  
+PID 59918 Daemon writing line 3 to the file.  
+PID 59734 Daemon writing line 4 to the file.  
+PID 59831 Daemon writing line 4 to the file.  
+PID 59918 Daemon writing line 4 to the file.  
+PID 59734 Daemon writing line 5 to the file.  
+PID 59831 Daemon writing line 5 to the file.  
+PID 59918 Daemon writing line 5 to the file.  

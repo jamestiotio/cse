@@ -33,9 +33,9 @@ int shellCheckDaemon_code()
       return 1;
     }
    
-   size_t size = 0;
+   size_t size = SHELL_BUFFERSIZE;;
    size_t line_size = 0;
-   char* line = NULL;
+   char* line = (char*) malloc(sizeof(char) * size);;
 
    do{
       //printf("The value of the line size is %d \n",line_size);
@@ -58,6 +58,7 @@ int shellCheckDaemon_code()
    // TODO: close any file pointers and free any statically allocated memory 
 
    free(command);
+   free(line);
    return 1;
 }
 
