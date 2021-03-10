@@ -21,7 +21,7 @@
 #include <sys/resource.h>
 
 int main(){
-    unmask(0);
+    umask(0);
     printf("Managed to set file permissions to 0777");
     return 1;
 }

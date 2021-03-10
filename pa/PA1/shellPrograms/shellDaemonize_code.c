@@ -137,7 +137,7 @@ int main(int argc, char **args)
 {
     create_daemon();
 
-    printf("created daemon correctly\n");
+    //printf("created daemon correctly\n");
     /* Open the log file */
     openlog("customdaemon", LOG_PID, LOG_DAEMON);
     syslog(LOG_NOTICE, "Daemon started.");
