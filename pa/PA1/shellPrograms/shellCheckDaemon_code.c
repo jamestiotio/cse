@@ -38,7 +38,7 @@ int shellCheckDaemon_code()
    size_t line_size = 0;
    char* line = (char*) malloc(sizeof(char) * size);
 
-   while ((line_size = getline(&line, &size, fp)) >= 0) {
+   while ((line_size = getline(&line, &size, fp)) != -1) {
       // printf("The value of the line size is %d \n", line_size);
       live_daemons++;
       fwrite(line, line_size, 1, stdout);
