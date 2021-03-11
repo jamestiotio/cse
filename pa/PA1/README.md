@@ -1,4 +1,4 @@
-# Programming Assignment 1
+# Programming Assignment 1: CSESHELL
 
 > **_CSEShell_**, not your ordinary shell.
 
