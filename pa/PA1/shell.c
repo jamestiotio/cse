@@ -5,7 +5,6 @@
 */
 int shellFind(char **args)
 {
-
   printf("shellFind is called!\n");
 
   /** TASK 4 **/
@@ -15,6 +14,11 @@ int shellFind(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellFind if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/find", args) == -1) {
+    perror("Failed to execute find! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -32,6 +36,11 @@ int shellDisplayFile(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellDisplayFile if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/display", args) == -1) {
+    perror("Failed to execute display! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -40,7 +49,6 @@ int shellDisplayFile(char **args)
 */
 int shellListDirAll(char **args)
 {
-
   printf("shellListDirAll is called!\n");
 
   /** TASK 4 **/
@@ -50,6 +58,11 @@ int shellListDirAll(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellListDirAll if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/listdirall", args) == -1) {
+    perror("Failed to execute listdirall! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -67,6 +80,11 @@ int shellListDir(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellListDir
 
+  if (execvp("./shellPrograms/listdir", args) == -1) {
+    perror("Failed to execute listdir! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -85,6 +103,11 @@ int shellCountLine(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellCountLine if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/countline", args) == -1) {
+    perror("Failed to execute countline! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -102,6 +125,11 @@ int shellSummond(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellDaemonize if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/summond", args) == -1) {
+    perror("Failed to execute summond! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -121,6 +149,11 @@ int shellCheckDaemon(char **args)
   // 4. Print some kind of error message if it returns -1
   // 5. return 1 to the caller of shellCheckDaemon if execvp fails to allow loop to continue
 
+  if (execvp("./shellPrograms/checkdaemon", args) == -1) {
+    perror("Failed to execute checkdaemon! Please ensure that you are currently in the correct working directory.");
+  }
+
+  // This line will only be reached if execvp() fails to create a new process image
   return 1;
 }
 
@@ -247,15 +280,60 @@ int shellUsage(char **args)
 int shellExecuteInput(char **args)
 {
   /** TASK 3 **/
-
   // 1. Check if args[0] is NULL. If it is, an empty command is entered, return 1
   // 2. Otherwise, check if args[0] is in any of our builtin_commands, and that it is NOT cd, help, exit, or usage.
   // 3. If conditions in (2) are satisfied, perform fork(). Check if fork() is successful.
-  // 4. For the child process, execute the appropriate functions depending on the command in args[0]. Pass char ** args to the function.
+  // 4. For the child process, execute the appropriate functions depending on the command in args[0]. Pass char** args to the function.
   // 5. For the parent process, wait for the child process to complete and fetch the child's return value.
   // 6. Return the child's return value to the caller of shellExecuteInput
   // 7. If args[0] is not in builtin_command, print out an error message to tell the user that command doesn't exist and return 1
 
+  if (args[0] == NULL) {
+    // An empty command was entered
+    return 1;
+  }
+
+  // Check if the command exists in the command list
+  for (int i = 0; i < numOfBuiltinFunctions(); i++)
+  {
+    if (strcmp(args[0], builtin_commands[i]) == 0)
+    {
+      // Hardcoded check
+      if (i != 0 && i != 1 && i != 2 && i != 3)
+      {
+        // Create a new process to run the function with the specific command, except if it is cd, help, exit or usage
+        pid_t pid = fork();
+        
+        // Check for fork()'s exit status code
+        if (pid == 0)
+        {
+          int status = (*builtin_commandFunc[i])(args);
+          exit(status);
+        }
+        else if (pid < 0)
+        {
+          perror("Fork does not work and it has failed. Exiting program...");
+          exit(EXIT_FAILURE);
+        }
+        else
+        {
+          int stat_loc;
+          printf("Fork works, waiting for child process to finish...\n");
+          // Wait until the process has finished running
+          waitpid(pid, &stat_loc, WUNTRACED);
+          return stat_loc;
+        }
+      }
+      else
+      {
+        // For cd, help, exit or usage commands, do the command in this same process space
+        return (*builtin_commandFunc[i])(args);
+      }
+    }
+  }
+
+  // Otherwise, print the error message
+  printf("Invalid command received. Type help to see what commands are implemented.\n");
   return 1;
 }
 
@@ -265,14 +343,24 @@ int shellExecuteInput(char **args)
 char *shellReadLine(void)
 {
   /** TASK 1 **/
-  // read one line from stdin using getline()
+  // Read one line from stdin using getline()
 
   // 1. Allocate a memory space to contain the string of input from stdin using malloc. Malloc should return a char* that persists even after this function terminates.
   // 2. Check that the char* returned by malloc is not NULL
   // 3. Fetch an entire line from input stream stdin using getline() function. getline() will store user input onto the memory location allocated in (1)
   // 4. Return the char*
 
-  return NULL;
+  size_t bufsize = SHELL_BUFFERSIZE;
+  char* line = (char*) malloc(SHELL_BUFFERSIZE * sizeof(char));
+
+  if (!line) {
+    perror("Undefined input due to allocation error for input buffer. Exiting program...\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  getline(&line, &bufsize, stdin);
+
+  return line;
 }
 
 /**
@@ -281,14 +369,38 @@ char *shellReadLine(void)
 
 char **shellTokenizeInput(char *line)
 {
-
   /** TASK 2 **/
   // 1. Allocate a memory space to contain pointers (addresses) to the first character of each word in *line. Malloc should return char** that persists after the function terminates.
-  // 2. Check that char ** that is returend by malloc is not NULL
+  // 2. Check that char** that is returned by malloc is not NULL
   // 3. Tokenize the *line using strtok() function
-  // 4. Return the char **
+  // 4. Return the char**
 
-  return NULL;
+  // Define an array of pointers to each of the first chars that mark the tokens in the line
+  char** tokens = (char**) malloc(SHELL_BUFFERSIZE * sizeof(char*));
+
+  if (!tokens) {
+    perror("Null address specified and allocation error encountered. Exiting program...");
+    exit(EXIT_FAILURE);
+  }
+
+  int index_position = 0;
+  // Tokenize the line and store it at **tokens
+  char* current_token = strtok(line, SHELL_INPUT_DELIM);
+  tokens[index_position] = current_token;
+  index_position++;
+
+  while (current_token != NULL)
+  {
+    // Tokenize the rest of the inputs
+    current_token = strtok(NULL, SHELL_INPUT_DELIM);
+    tokens[index_position] = current_token;
+    index_position++;
+  }
+
+  // Add a NULL to terminate the line at the end
+  tokens[index_position] = NULL;
+
+  return tokens;
 }
 
 /**
@@ -297,14 +409,13 @@ char **shellTokenizeInput(char *line)
  */
 void shellLoop(void)
 {
-  //instantiate local variables
+  // Instantiate local variables
   char *line;  // to accept the line of string from user
   char **args; // to tokenize them as arguments separated by spaces
   int status;  // to tell the shell program whether to terminate shell or not
 
-
   /** TASK 5 **/
-  //write a loop where you do the following: 
+  // Write a loop where you do the following: 
 
   // 1. print the message prompt
   // 2. clear the buffer and move the output to the console using fflush
@@ -316,16 +427,31 @@ void shellLoop(void)
   // 7. free memory location containing char* to the first letter of each word in the input string
   // 8. check if shellExecuteInput returns 1. If yes, loop back to Step 1 and prompt user with new input. Otherwise, exit the shell. 
 
+  // A do-while loop is much more performant than a recursive solution
+  // It is also the selected method of implementation used by general standard popular shells (like Bash and Zsh)
+  // For further reference:
+  // - https://brennan.io/2015/01/16/write-a-shell-in-c/
+  // - https://git.savannah.gnu.org/cgit/bash.git/tree/shell.c#n447
+  // - https://sourceforge.net/p/zsh/code/ci/master/tree/Src/init.c#l1738
+  // - https://sourceforge.net/p/zsh/code/ci/master/tree/Src/init.c#l1794
+  do {
+    printf("CSEShell> ");
+    fflush(stdout);
+    // fflush(stdin); // This is undefined behaviour, do not use this!
+    line = shellReadLine(); // Call shellReadLine that returns char pointer
+    args = shellTokenizeInput(line);
+    status = shellExecuteInput(args);
 
+    free(line);
+    free(args);
+  } while (status);
 }
 
 int main(int argc, char **argv)
 {
-
   printf("Shell Run successful. Running now: \n");
 
   // Run command loop
   shellLoop();
-
   return 0;
 }
