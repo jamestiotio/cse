@@ -44,7 +44,7 @@ int shellCheckDaemon_code()
       fwrite(line, line_size, 1, stdout);
    }
 
-   // TODO: Close any file pointers and free any statically allocated memory
+   // TODO: Close any file pointers and free any dynamically allocated memory
    free(line);
    line = NULL;
    fclose(fp);
