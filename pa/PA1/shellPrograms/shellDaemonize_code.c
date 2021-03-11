@@ -142,6 +142,19 @@ int main(int argc, char **args)
     ssize_t read = 0;
     puts("Please specify the absolute path of the file to be used as a log file: ");
     read = getline(&line, &len, stdin);
+
+    // Remove trailing newline character from input line, if any
+    if ((line)[read - 1] == '\n') {
+        (line)[read - 1] = '\0';
+        --read;
+    }
+
+    // Remove trailing carriage return character from input line, if any
+    if ((line)[read - 1] == '\r') {
+        (line)[read - 1] = '\0';
+        --read;
+    }
+
     path = line;
 
     create_daemon();
