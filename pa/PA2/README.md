@@ -13,7 +13,7 @@ The server will be called `SecStore`. It’s an Internet server that is running 
 2. Handshake with the server, and then
 3. Perform the upload.
 
-The CSE teaching staff will act as our trusted CA, their service being called `Csertificate`.
+The CSE teaching staff will act as our trusted CA (Certificate/Certification Authority), their service being called `Csertificate`.
 
 In particular, these are the basic requirements:
 
