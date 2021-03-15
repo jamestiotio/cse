@@ -216,6 +216,13 @@ int shellUsage(char **args)
 {
   int functionIndex = -1;
 
+  // Check if there is an argument
+  if (args[1] == NULL)
+  {
+    fprintf(stderr, "CSEShell: Expected an argument for the \"usage\" command.\n");
+    return 1;
+  }
+
   // Check if the commands exist in the command list
   for (int i = 0; i < numOfBuiltinFunctions(); i++)
   {
