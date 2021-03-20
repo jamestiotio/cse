@@ -14,8 +14,10 @@ all: target_main
 
 target_main: shell.c
 	$(CC) shell.c -o customshell
+	cd shellPrograms && make
 
 
 clean:
 	$(REMOVE) customshell
+	cd shellPrograms && make clean
 
