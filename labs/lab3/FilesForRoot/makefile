@@ -8,8 +8,8 @@ CC = gcc
 # target:  dependency1 dependency2 ...
 #       <tab> command
 
-#Called by: make targetname 
-#also executed when you just called make. This calls the first target. 
+# Called by: make targetname 
+# also executed when you just called make. This calls the first target. 
 all: rootprogram rootdoprogram logaccessprogram rootprogram_nosuid setup 
 
 rootprogram: rootprog.c
@@ -26,10 +26,13 @@ logaccessprogram: logaccess.c
 rootprogram_nosuid: rootprog.c 
 	$(CC) rootprog.c -o ../Root/rootprog_nosuid
 
-# refresh the root files and root log file
+# Refresh the root files and root log file
 # Set UID for rootprog and rootdo
 # Set logaccess to be executable only by ROOT
-setup: 
+# Do take note that chmod and chown do not work if the files are on a Windows NTFS partition filesystem (for Ubuntu-Windows dual-boot cases)
+# This is because Windows NTFS and Ubuntu Linux/UNIX have different ways of handling file permissions
+# Additional extra NTFS drivers might be needed to change NTFS file permissions from a UNIX system (which is quite troublesome)
+setup:
 	chmod 744 ../Root/logaccess 
 	chmod u+s ../Root/rootprog 
 	chmod u+s ../Root/rootdo
@@ -49,4 +52,3 @@ clean:
 	$(REMOVE) ../Root/rootfile.txt
 	$(REMOVE) ../Root/rootlogfile.txt
 	rm -rf ../Root/
-

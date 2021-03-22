@@ -1,7 +1,5 @@
 /* toctou_prog.c */
 
-
-
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -9,9 +7,7 @@
 #include <sys/types.h>
 #define DELAY 1
 
-int main(int argc, char * argv[])
-
-{ 
+int main(int argc, char * argv[]) {
     char * fileName = argv[1];
     char username[64];
     char password[64];
@@ -32,16 +28,16 @@ int main(int argc, char * argv[])
      * 
      **/
 
-    if(!access(fileName, W_OK)) 
-    {
+    if (!access(fileName, W_OK)) {
         printf("Access Granted \n");
-        /*Simulating the Delay*/ 
-        sleep(DELAY); // sleep for 1 secs
+        seteuid(getuid());  // Manually set the effective UID as the actual real UID of the process
+        /* Simulating the Delay */ 
+        sleep(DELAY); // Sleep for 1 second
         fileHandler = fopen(fileName, "a+");
         if (fileHandler == NULL){
             printf("File cannot be opened\n");
         }
-        
+
         fprintf(fileHandler, "\nPID %d is writing -- ", getpid());
         fwrite(username, sizeof(char), strlen(username), fileHandler);
         fwrite(": ", sizeof(char), 2, fileHandler);  
@@ -50,11 +46,9 @@ int main(int argc, char * argv[])
         fclose(fileHandler);
         printf("Exit success\n");
     } 
-    else{
+    else {
         printf("ERROR, permission denied\n");
     }
 
     return 0;
-
 }
-

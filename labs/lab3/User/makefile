@@ -8,8 +8,8 @@ CC = gcc
 # target:  dependency1 dependency2 ...
 #       <tab> command
 
-#Called by: make targetname 
-#also executed when you just called make. This calls the first target. 
+# Called by: make targetname 
+# also executed when you just called make. This calls the first target. 
 all: symlinkfile
 
 symlinkfile: symlink.c

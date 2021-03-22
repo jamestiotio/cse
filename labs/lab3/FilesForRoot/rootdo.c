@@ -6,8 +6,7 @@
 #include <termios.h>
 
 // Usage: ./rootdo ./logaccess testLogfromRootdo
-int main(int argc, char* argv[]){
-
+int main(int argc, char* argv[]) {
     char * execName = argv[1];
     char * filename = argv[2];
     char * argv_new[3] = {execName, filename, NULL};
@@ -15,7 +14,6 @@ int main(int argc, char* argv[]){
 
     printf("Exec name is %s, with filename %s \n", execName, filename);
     printf("Please enter your password: ");
-
 
     /*Routine to stop echoing the scanf input back to the terminal temporarily*/
     struct termios term, term_orig;
@@ -50,5 +48,4 @@ int main(int argc, char* argv[]){
     }
 
     return 0;
-
 }

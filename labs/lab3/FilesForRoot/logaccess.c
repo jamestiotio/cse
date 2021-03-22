@@ -8,8 +8,7 @@
 // only ROOT can read, write, execute 
 // no SUID bit set
 
-int main(int argc, char* argv[]){
-
+int main(int argc, char* argv[]) {
     char * message = argv[1];
     FILE * fileHandler;
 
@@ -28,5 +27,4 @@ int main(int argc, char* argv[]){
     printf("Root log write success\n");
 
     return 0;
-
 }
