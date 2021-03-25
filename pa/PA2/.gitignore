@@ -1,6 +1,9 @@
 .DS_Store
 Thumbs.db
 
+credentials/*
+!credentials/placeholder
+
 # Compiled class file
 *.class
 
