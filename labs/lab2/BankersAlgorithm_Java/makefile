@@ -6,7 +6,7 @@ all: Banker.java TestBankQ1.java TestBankQ2.java
 testq1: checkq1 Banker.class TestBankQ1.class
 	./checkq1
 
-testq2: checkq2 Banker.class  TestBankQ2.class
+testq2: checkq2 Banker.class TestBankQ2.class
 	./checkq2
 
 clean:
