@@ -32,7 +32,7 @@ public class DigitalSignatureSolution {
         Key publicKey = keyPair.getPublic();
         Key privateKey = keyPair.getPrivate();
 
-        // TODO: Calculate message digest, using MD5 hash function
+        // TODO: calculate message digest, using MD5 hash function
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(data.toString().getBytes());
         byte[] digest = md.digest();
@@ -43,7 +43,7 @@ public class DigitalSignatureSolution {
                 "MD5 digest of " + fileName + ": " + Base64.getEncoder().encodeToString(digest));
         System.out.println("MD5 digest length of " + fileName + ": " + digest.length);
 
-        // TODO: Create RSA("RSA/ECB/PKCS1Padding") cipher object and initialize is as encrypt mode,
+        // TODO: create RSA("RSA/ECB/PKCS1Padding") cipher object and initialize it as encrypt mode,
         // use PRIVATE key.
         Cipher encrypt = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         encrypt.init(Cipher.ENCRYPT_MODE, privateKey);
@@ -56,7 +56,7 @@ public class DigitalSignatureSolution {
                 + Base64.getEncoder().encodeToString(encrypted));
         System.out.println("Signed digest length of " + fileName + ": " + encrypted.length);
 
-        // TODO: Create RSA("RSA/ECB/PKCS1Padding") cipher object and initialize is as decrypt mode,
+        // TODO: create RSA("RSA/ECB/PKCS1Padding") cipher object and initialize it as decrypt mode,
         // use PUBLIC key.
         Cipher decrypt = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         decrypt.init(Cipher.DECRYPT_MODE, publicKey);
