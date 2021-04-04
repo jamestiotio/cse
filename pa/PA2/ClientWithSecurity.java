@@ -3,9 +3,16 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ClientWithoutSecurity {
+public class ClientWithSecurity {
     public static void main(String[] args) {
+        final Map<String, List<String>> params = new HashMap<>();
+
+        List<String> options = null;
+
         String filename = "100.txt";
         if (args.length > 0)
             filename = args[0];
