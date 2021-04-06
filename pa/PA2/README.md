@@ -1,13 +1,13 @@
 # Programming Assignment 2: Secure File Transfer Protocol
 
-> Basic SFTP Implementation.
+> Basic FTPS Implementation.
 
 Team Members (Pair ID 0, Class CI03):
 
 - [James Raphael Tiovalen](https://github.com/jamestiotio)
 - [Leong Yun Qin Melody](https://github.com/caramelmelmel)
 
-> Same partnership as PA1.
+> Same partnership as PA1. We implement FTPS over SSL/TLS instead of SFTP over SSH due to the requirements of the assignment.
 
 In this programming assignment, we are tasked to implement a secure file upload application from a client to an Internet file server (following the client-server paradigm). By secure, we mean two properties. First, before you do your upload as the client, you should authenticate the identity of the file server so you won’t leak your data to random entities including criminals. Second, while carrying out the upload, you should be able to protect the confidentiality of the data against eavesdropping by any curious adversaries.
 
