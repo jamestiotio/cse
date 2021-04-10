@@ -9,3 +9,6 @@ In NS Module 4, we learnt about the role of the Domain Name System (DNS) in Inte
 - Understand how a DNS query is resolved using hierarchy and recursion
 - Observe and understand the effect of caching on DNS lookup times
 - Use Wireshark to trace and read DNS packets sent to and from a machine
+
+> Instead of using `dig`, `nslookup` can be used if user is on Windows instead.
+
