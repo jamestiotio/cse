@@ -12,3 +12,5 @@ In NS Module 4, we learnt about the role of the Domain Name System (DNS) in Inte
 
 > Instead of using `dig`, `nslookup` can be used if user is on Windows instead.
 
+Other useful networking tools in real life would include `host` and `whois` (`sudo apt install whois`).
+
