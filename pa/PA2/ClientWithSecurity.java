@@ -70,6 +70,7 @@ public class ClientWithSecurity {
                 toServer.flush();
             }
 
+            //end the loop here
             bufferedFileInputStream.close();
             fileInputStream.close();
 
