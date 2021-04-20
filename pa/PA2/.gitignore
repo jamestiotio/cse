@@ -2,7 +2,13 @@
 Thumbs.db
 
 credentials/*
-!credentials/placeholder
+!credentials/cacsertificate.crt
+!credentials/server
+credentials/server/*
+!credentials/server/placeholder
+!credentials/client
+credentials/client/*
+!credentials/client/placeholder
 
 # Compiled class file
 *.class
