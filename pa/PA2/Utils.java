@@ -209,6 +209,16 @@ public class Utils {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, publicServerKey);
             byte[] decryptedNonce = cipher.doFinal(encryptedNonce);
+
+            try {
+                if (fis != null)
+                    fis.close();
+                if (fis2 != null)
+                    fis2.close();
+            } catch (IOException e) {
+                return ByteBuffer.wrap(decryptedNonce).getInt();
+            }
+
             return ByteBuffer.wrap(decryptedNonce).getInt();
         }
         // Get back the server's nonce obtained from client
