@@ -88,7 +88,7 @@ To run this program, first ensure that all the dependencies are met:
 
 After ensuring that all dependencies exist, compile both the client and server Java code files. Then, run the server program first on a terminal window, and then run the client program on a different terminal window.
 
-During the initial AP handshake, the client will first download the server's CA-signed public key certificate (and put it inside `upload/`), and then the server will download the client's public key (and put it inside `download/`).
+During the initial AP handshake, the client will first download the server's CA-signed public key certificate (and put it inside `download/`), and then the server will download the client's public key (and put it inside `upload/`).
 
 Any uploaded files to the server will be stored under the `upload/` folder, while any downloaded files by the client will be stored under the `download/` folder (all with respect to the current working directory where the programs are being run from).
 
