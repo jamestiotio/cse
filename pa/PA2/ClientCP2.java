@@ -62,6 +62,9 @@ public class ClientCP2 {
                 int decryptedNonce = 0;
                 System.out.println("Authenticating server...");
                 try {
+                    // Request authentication
+                    toServer.writeInt(PacketTypes.VERIFY_SERVER_PACKET.getValue());
+                    toServer.flush();
                     decryptedNonce = Utils.authenticate(nonce, toServer, fromServer,
                             "challenge_the_server", "CP2");
                 } catch (Exception e) {
@@ -86,10 +89,6 @@ public class ClientCP2 {
                     Utils.acceptChallenge(toServer, fromServer, privateClientKey,
                             publicKeyFilename);
                 }
-
-                // For some reason, putting this prevents a deadlock.
-                // TODO: Fix protocol!
-                Thread.sleep(1000);
 
                 // Verify user
                 toServer.writeInt(PacketTypes.AUTH_LOGIN_USERNAME_PACKET.getValue());
@@ -137,6 +136,7 @@ public class ClientCP2 {
                         try {
                             for (String file : files) {
                                 String filename = "data/" + file;
+                                toServer.writeInt(PacketTypes.UPLOAD_FILE_PACKET.getValue());
                                 int packets = Utils.sendEncryptedFile(toServer, filename,
                                         sessionKey, "CP2");
                                 packetCount += packets;
@@ -232,6 +232,9 @@ public class ClientCP2 {
                 int decryptedNonce = 0;
                 System.out.println("Authenticating server...");
                 try {
+                    // Request authentication
+                    toServer.writeInt(PacketTypes.VERIFY_SERVER_PACKET.getValue());
+                    toServer.flush();
                     decryptedNonce = Utils.authenticate(nonce, toServer, fromServer,
                             "challenge_the_server", "CP2");
                 } catch (Exception e) {
@@ -261,10 +264,6 @@ public class ClientCP2 {
                             publicKeyFilename);
                     toServer.flush();
                 }
-
-                // For some reason, putting this prevents a deadlock.
-                // TODO: Fix protocol!
-                Thread.sleep(1000);
 
                 // Verify user
                 toServer.writeInt(PacketTypes.AUTH_LOGIN_USERNAME_PACKET.getValue());
@@ -326,6 +325,7 @@ public class ClientCP2 {
                             try {
                                 for (String file : filesToSend) {
                                     String filename = "data/" + file;
+                                    toServer.writeInt(PacketTypes.UPLOAD_FILE_PACKET.getValue());
                                     int packets = Utils.sendEncryptedFile(toServer, filename,
                                             sessionKey, "CP2");
                                     packetCount += packets;

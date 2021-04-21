@@ -17,24 +17,24 @@ def main():
         markers=True,
         hue="mode",
         style="mode",
-        ax=ax[0],
+        ax=ax,
         palette=palette,
     )
 
     # Label all the data points
     for item, color in zip(df.groupby("mode", sort=False), palette):
         for x, y in item[1][["file_size", "average_time"]].values:
-            ax[0].text(
+            ax.text(
                 x,
                 y,
-                f"({x}, {y})",
+                f"({x:.2f}, {y:.2f})",
                 color=color,
                 fontsize=8,
                 horizontalalignment="right",
                 verticalalignment="bottom",
             )
 
-    ax[0].set(xlabel="File size (bytes)", ylabel="Average time taken (ms)")
+    ax.set(xlabel="File size (bytes)", ylabel="Average time taken (ms)")
     plt.show()
 
 

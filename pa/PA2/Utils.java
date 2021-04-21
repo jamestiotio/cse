@@ -5,6 +5,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -29,14 +30,9 @@ public class Utils {
     public static int sendEncryptedFile(DataOutputStream toServer, String fileToSend, Key key,
             String mode) throws Exception {
         int packets = 0;
-        FileInputStream fileInputStream = new FileInputStream(fileToSend);
-        BufferedInputStream bufferedFileInputStream = new BufferedInputStream(fileInputStream);
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
-
         cipher.init(Cipher.ENCRYPT_MODE, key);
-
-        toServer.writeInt(PacketTypes.UPLOAD_FILE_PACKET.getValue());
         // Encrypt filename
         byte[] encryptedFilename = cipher.doFinal(fileToSend.getBytes());
         // Send encrypted filename
@@ -45,24 +41,32 @@ public class Utils {
         toServer.flush();
         packets += 3;
 
+        FileInputStream fileInputStream = new FileInputStream(fileToSend);
+        BufferedInputStream bufferedFileInputStream = new BufferedInputStream(fileInputStream);
+
         // Since we use RSA key size of 4096 bits, maximum block length is floor(4096/8) - 11 = 501
         // bytes
-        byte[] buffer = ((mode.equalsIgnoreCase("CP1")) ? new byte[501] : new byte[4095]);
-        int count;
+        int blockSize = ((mode.equalsIgnoreCase("CP1")) ? 501 : 4096);
+        byte[] buffer = new byte[blockSize];
         System.out.println("Sending file contents...");
-        while ((count = bufferedFileInputStream.read(buffer)) > 0) {
-            byte[] encryptedBuffer = cipher.doFinal(buffer);
-            if (mode.equalsIgnoreCase("CP1"))
-                toServer.write(encryptedBuffer, 0, 512);
-            else
-                toServer.write(encryptedBuffer, 0, encryptedBuffer.length);
-            packets++;
-            toServer.writeInt(count);
+        for (boolean fileEnded = false; !fileEnded;) {
+            toServer.writeInt(PacketTypes.FILE_DATA_PACKET.getValue());
+            int numBytes = bufferedFileInputStream.read(buffer);
+            if (numBytes == -1)
+                break;
+            byte[] anotherFileBuffer = Arrays.copyOfRange(buffer, 0, numBytes);
+            byte[] encryptedBuffer = cipher.doFinal(anotherFileBuffer);
+            fileEnded = numBytes < blockSize;
+            toServer.writeInt(encryptedBuffer.length);
+            toServer.writeInt(numBytes);
+            toServer.write(encryptedBuffer);
             toServer.flush();
         }
 
         bufferedFileInputStream.close();
         fileInputStream.close();
+
+        System.out.println(fileToSend + " has been sent.");
 
         return packets;
     }
@@ -73,7 +77,6 @@ public class Utils {
             String direction) throws Exception {
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
-
         cipher.init(Cipher.DECRYPT_MODE, key);
 
         int numBytes = fromClient.readInt();
@@ -100,19 +103,27 @@ public class Utils {
         FileOutputStream fileOutputStream = new FileOutputStream(filename);
         BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
 
-        byte[] buffer = ((mode.equalsIgnoreCase("CP1")) ? new byte[512] : new byte[4096]);
-        while (fromClient.read(buffer) > 0) {
-            byte[] decryptedBuffer = cipher.doFinal(buffer);
-            int count = fromClient.readInt();
-            bufferedFileOutputStream.write(decryptedBuffer, 0, count);
-            // Terminate the file sequence
-            if (mode.equalsIgnoreCase("CP1")) {
-                if (count < 501)
-                    break;
-            } else {
-                if (count < 4095)
-                    break;
+        int blockSize = ((mode.equalsIgnoreCase("CP1")) ? 501 : 4096);
+        System.out.println("Receiving file contents...");
+
+        int packetType = fromClient.readInt();
+        while (packetType == PacketTypes.FILE_DATA_PACKET.getValue()) {
+            numBytes = fromClient.readInt();
+            Integer end = fromClient.readInt();
+            byte[] encryptedBlock = new byte[numBytes];
+            fromClient.readFully(encryptedBlock, 0, numBytes);
+            byte[] decryptedBlock = cipher.doFinal(encryptedBlock);
+
+            if (end > 0)
+                bufferedFileOutputStream.write(decryptedBlock, 0, decryptedBlock.length);
+            if (end < blockSize) {
+                if (bufferedFileOutputStream != null)
+                    bufferedFileOutputStream.close();
+                if (bufferedFileOutputStream != null)
+                    fileOutputStream.close();
+                break;
             }
+            packetType = fromClient.readInt();
         }
 
         bufferedFileOutputStream.close();
@@ -125,18 +136,6 @@ public class Utils {
     // Assumes that the default version is to challenge the client and the default mode is CP2
     public static int authenticate(int nonce, DataOutputStream toParty, DataInputStream fromParty,
             String version, String mode) throws Exception {
-        // Request authentication
-        if (version.equalsIgnoreCase("challenge_the_server")) {
-            toParty.writeInt(PacketTypes.VERIFY_SERVER_PACKET.getValue());
-            toParty.flush();
-        } else if (version.equalsIgnoreCase("challenge_the_client")) {
-            // For some reason, putting this prevents a deadlock.
-            // TODO: Fix protocol!
-            Thread.sleep(1000);
-            toParty.writeInt(PacketTypes.VERIFY_CLIENT_PACKET.getValue());
-            toParty.flush();
-        }
-
         // Send nonce
         toParty.writeInt(nonce);
         toParty.flush();
@@ -155,18 +154,26 @@ public class Utils {
         numBytes = fromParty.readInt();
         byte[] filename = new byte[numBytes];
         fromParty.readFully(filename, 0, numBytes);
-        String certificateFilename = new String(filename, 0, numBytes);
+        String certificateFilename = "upload/" + new String(filename, 0, numBytes).split("/")[2];
+        if (version.equalsIgnoreCase("challenge_the_server")) {
+            certificateFilename = "download/" + new String(filename, 0, numBytes).split("/")[2];
+        }
         System.out.println("Received certificate filename: " + certificateFilename);
 
         FileOutputStream fileOutputStream = new FileOutputStream(certificateFilename);
         BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
 
-        byte[] buffer = new byte[4095];
-        int count;
-        while ((count = fromParty.read(buffer)) > 0) {
-            bufferedFileOutputStream.write(buffer, 0, count);
-            if (count < 4095) {
-                break;
+        int anotherNumBytes = fromParty.readInt();
+        byte[] block = new byte[anotherNumBytes];
+        fromParty.readFully(block, 0, anotherNumBytes);
+        if (anotherNumBytes > 0)
+            bufferedFileOutputStream.write(block, 0, anotherNumBytes);
+        if (anotherNumBytes < 4095) {
+            if (bufferedFileOutputStream != null) {
+                bufferedFileOutputStream.close();
+            }
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
             }
         }
 
@@ -209,7 +216,7 @@ public class Utils {
             // Reminder that client does not has a signed public key certificate in real-life
             // Thus, we only use the client's public key to verify the nonce
             // Note that we do not need to encrypt the client's public key since it is, well, public
-            PublicKey publicClientKey = PublicKeyReader.get("credentials/client/public_key.der");
+            PublicKey publicClientKey = PublicKeyReader.get(certificateFilename);
             if (mode.equalsIgnoreCase("CP1")) {
                 ServerCP1.publicClientKey = publicClientKey;
             } else {
@@ -256,10 +263,16 @@ public class Utils {
         toServer.writeInt(fileToSend.getBytes().length);
         toServer.write(fileToSend.getBytes());
         toServer.flush();
-        int count;
+        int numBytes = 0;
         byte[] buffer = new byte[4095];
-        while ((count = bufferedFileInputStream.read(buffer)) > 0) {
-            toServer.write(buffer, 0, count);
+        for (boolean fileEnded = false; !fileEnded;) {
+            numBytes = bufferedFileInputStream.read(buffer);
+            if (numBytes == -1)
+                break;
+            fileEnded = numBytes < 4095;
+
+            toServer.writeInt(numBytes);
+            toServer.write(buffer, 0, numBytes);
             toServer.flush();
         }
         bufferedFileInputStream.close();

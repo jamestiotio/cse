@@ -88,6 +88,8 @@ To run this program, first ensure that all the dependencies are met:
 
 After ensuring that all dependencies exist, compile both the client and server Java code files. Then, run the server program first on a terminal window, and then run the client program on a different terminal window.
 
+During the initial AP handshake, the client will first download the server's CA-signed public key certificate (and put it inside `upload/`), and then the server will download the client's public key (and put it inside `download/`).
+
 Any uploaded files to the server will be stored under the `upload/` folder, while any downloaded files by the client will be stored under the `download/` folder (all with respect to the current working directory where the programs are being run from).
 
 Alternatively, for the purposes of the demo, ensure that the demo files are in their appropriate locations and run these commands to automate all the process above:
@@ -119,7 +121,7 @@ These would be the appropriate space-time diagrams of our corrected authenticati
 
 We compare the performance of the client and server using different confidentiality protocols (i.e., CP1 vs. CP2) in terms of data throughput (using a single thread):
 
-![Diagram/Graph of Average Time Taken against File Size]()
+![Diagram/Graph of Average Time Taken against File Size](docs/performance_comparison.png)
 
 As clearly seen from the benchmarking plot, CP2 (using AES) is a much more performant data confidentiality protocol compared to CP1 (using RSA) for the purposes of file transfer.
 
@@ -129,8 +131,8 @@ As clearly seen from the benchmarking plot, CP2 (using AES) is a much more perfo
 
 In order of importance:
 
-- Fix the deadlock timing issue for the server-side authentication of verifying that it is indeed communicating with a live client (it is still imperfect). This protocol inconsistency seems to also affect success rate of file transfer for larger files.
 - Implement a sequence number tracker from each side so as to prevent partial playback/replay attack within a single session.
 - Implement a concurrent, multi-threaded file data transfer method (either use threads or an executor with a fixed thread pool size; AtomicIntegers and CyclicBarriers might be needed). This is possible because we are using the ECB encryption mode of operation (for simplicity purposes).
+- Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths, etc.
 - Implement the auto demo script.
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).

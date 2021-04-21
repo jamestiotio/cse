@@ -80,6 +80,9 @@ public class ServerCP1 {
                         int decryptedNonce = 0;
                         System.out.println("Authenticating client...");
                         try {
+                            // Request authentication
+                            toClient.writeInt(PacketTypes.VERIFY_CLIENT_PACKET.getValue());
+                            toClient.flush();
                             decryptedNonce = Utils.authenticate(nonce, toClient, fromClient,
                                     "challenge_the_client", "CP1");
                         } catch (Exception e) {
@@ -140,6 +143,7 @@ public class ServerCP1 {
                                         authenticatedClient = true;
                                         toClient.writeInt(PacketTypes.OK_PACKET.getValue());
                                         toClient.flush();
+                                        System.out.println("Welcome, " + username + "!");
                                     } else {
                                         toClient.writeInt(PacketTypes.ERROR_PACKET.getValue());
                                         toClient.flush();
@@ -160,7 +164,7 @@ public class ServerCP1 {
                         fromClient.close();
                         toClient.close();
                         connectionSocket.close();
-                        System.out.println("Connection closed");
+                        System.out.println("Connection closed properly. Bye bye!");
                         break;
                     } else if (packetType == PacketTypes.UPLOAD_FILE_PACKET.getValue()
                             && authenticatedClient) {
@@ -242,7 +246,7 @@ public class ServerCP1 {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Connection not closed properly. Bye bye!");
             }
         }
     }
