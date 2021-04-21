@@ -136,3 +136,5 @@ In order of importance:
 - Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths, etc.
 - Implement the auto demo script.
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).
+- Add more extra commands like: CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
+
