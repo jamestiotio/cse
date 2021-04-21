@@ -59,7 +59,7 @@ $ openssl rsa -in example.org.key -noout -text
 $ openssl req -new -key example.org.key -out example.org.csr
 ```
 
-Then, contact [@csesubmitbot](https://t.me/csesubmitbot), send the `/signcertificate` command, followed by uploading the CSR file (`example.org.csr`, in our case) to the Telegram Bot. After some processing time, if everything is okay, the bot will then provide the signed certificate back, which can be downloaded to your directory of choice (`credentials`, in our case). Do not forget to also obtain the CA's public key (`cacsertificate.crt`).
+Then, contact [@csesubmitbot](https://t.me/csesubmitbot), send the `/signcertificate` command, followed by uploading the CSR file (`example.org.csr`, in our case) to the Telegram Bot. After some processing time, if everything is okay, the bot will then provide the signed certificate back, which can be downloaded to your directory of choice (`credentials/`, in our case). Do not forget to also obtain the CA's public key (`cacsertificate.crt`).
 
 Finally, rename `example.org.key` to `example.org.pem` and run these commands to allow JCE to read the private and public parts of the `.key` file:
 
