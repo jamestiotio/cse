@@ -6,68 +6,66 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerWithoutSecurity {
+    public static void main(String[] args) {
+        int port = 4321;
+        if (args.length > 0)
+            port = Integer.parseInt(args[0]);
 
-	public static void main(String[] args) {
+        ServerSocket welcomeSocket = null;
+        Socket connectionSocket = null;
+        DataOutputStream toClient = null;
+        DataInputStream fromClient = null;
 
-    	int port = 4321;
-    	if (args.length > 0) port = Integer.parseInt(args[0]);
+        FileOutputStream fileOutputStream = null;
+        BufferedOutputStream bufferedFileOutputStream = null;
 
-		ServerSocket welcomeSocket = null;
-		Socket connectionSocket = null;
-		DataOutputStream toClient = null;
-		DataInputStream fromClient = null;
+        try {
+            welcomeSocket = new ServerSocket(port);
+            connectionSocket = welcomeSocket.accept();
+            fromClient = new DataInputStream(connectionSocket.getInputStream());
+            toClient = new DataOutputStream(connectionSocket.getOutputStream());
 
-		FileOutputStream fileOutputStream = null;
-		BufferedOutputStream bufferedFileOutputStream = null;
+            while (!connectionSocket.isClosed()) {
+                int packetType = fromClient.readInt();
 
-		try {
-			welcomeSocket = new ServerSocket(port);
-			connectionSocket = welcomeSocket.accept();
-			fromClient = new DataInputStream(connectionSocket.getInputStream());
-			toClient = new DataOutputStream(connectionSocket.getOutputStream());
+                // If the packet is for transferring the filename
+                if (packetType == 0) {
+                    System.out.println("Receiving file...");
 
-			while (!connectionSocket.isClosed()) {
+                    int numBytes = fromClient.readInt();
+                    byte[] filename = new byte[numBytes];
+                    // Must use read fully!
+                    // See:
+                    // https://stackoverflow.com/questions/25897627/datainputstream-read-vs-datainputstream-readfully
+                    fromClient.readFully(filename, 0, numBytes);
 
-				int packetType = fromClient.readInt();
+                    fileOutputStream =
+                            new FileOutputStream("recv_" + new String(filename, 0, numBytes));
+                    bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
+                    // If the packet is for transferring a chunk of the file
+                } else if (packetType == 1) {
+                    int numBytes = fromClient.readInt();
+                    byte[] block = new byte[numBytes];
+                    fromClient.readFully(block, 0, numBytes);
 
-				// If the packet is for transferring the filename
-				if (packetType == 0) {
+                    if (numBytes > 0)
+                        bufferedFileOutputStream.write(block, 0, numBytes);
 
-					System.out.println("Receiving file...");
+                    if (numBytes < 117) {
+                        System.out.println("Closing connection...");
 
-					int numBytes = fromClient.readInt();
-					byte [] filename = new byte[numBytes];
-					// Must use read fully!
-					// See: https://stackoverflow.com/questions/25897627/datainputstream-read-vs-datainputstream-readfully
-					fromClient.readFully(filename, 0, numBytes);
-
-					fileOutputStream = new FileOutputStream("recv_"+new String(filename, 0, numBytes));
-					bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
-
-				// If the packet is for transferring a chunk of the file
-				} else if (packetType == 1) {
-
-					int numBytes = fromClient.readInt();
-					byte [] block = new byte[numBytes];
-					fromClient.readFully(block, 0, numBytes);
-
-					if (numBytes > 0)
-						bufferedFileOutputStream.write(block, 0, numBytes);
-
-					if (numBytes < 117) {
-						System.out.println("Closing connection...");
-
-						if (bufferedFileOutputStream != null) bufferedFileOutputStream.close();
-						if (bufferedFileOutputStream != null) fileOutputStream.close();
-						fromClient.close();
-						toClient.close();
-						connectionSocket.close();
-					}
-				}
-
-			}
-		} catch (Exception e) {e.printStackTrace();}
-
-	}
-
+                        if (bufferedFileOutputStream != null)
+                            bufferedFileOutputStream.close();
+                        if (bufferedFileOutputStream != null)
+                            fileOutputStream.close();
+                        fromClient.close();
+                        toClient.close();
+                        connectionSocket.close();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
