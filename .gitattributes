@@ -1,0 +1,1 @@
+pa/PA2/data/objects/** filter=lfs diff=lfs merge=lfs -text
