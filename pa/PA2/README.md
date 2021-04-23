@@ -160,3 +160,7 @@ In order of importance:
 - Use message digests and some hashing algorithms (such as MD5, SHA1 or SHA512) to verify on the server side that the file contents (in terms of bytes) are correct and that all data has been transferred properly.
 - Add more extra commands like: PWD, CWD, CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
 - Check for legitimacy of certificate that it is actually owned by `SecStore` (by checking its details like the institution's name, its country of creation/origin, the department, etc.)
+- Transfer over encrypted hashes of the username-password combinations instead of the encrypted versions of the username and password themselves.
+- Add GUI to both client and server.
+- Allow actual remote data transfer between client and server (might need to debug networking issues here).
+
