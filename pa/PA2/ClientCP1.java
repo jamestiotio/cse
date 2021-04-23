@@ -135,6 +135,10 @@ public class ClientCP1 {
                                 int packets = Utils.sendEncryptedFile(toServer, filename,
                                         publicServerKey, "CP1");
                                 packetCount += packets;
+                                int numBytes = fromServer.readInt();
+                                byte[] buffer = new byte[numBytes];
+                                fromServer.readFully(buffer, 0, numBytes);
+                                System.out.println(new String(buffer, 0, numBytes));
                             }
                         } catch (Exception e) {
                             System.out.println("Invalid file specified!");
@@ -178,13 +182,14 @@ public class ClientCP1 {
                             byte[] buffer = new byte[numBytes];
                             fromServer.readFully(buffer, 0, numBytes);
                             System.out.println(
-                                    new String(buffer, 0, numBytes) + " has been deleted!");
+                                    new String(buffer, 0, numBytes));
                         }
                     } else {
                         System.out.println("Please specify the file(s) to be deleted!");
                     }
                 } else if (command.equals("LSTDIR")) {
                     if (files == null) {
+                        System.out.println("Directory listing: ");
                         toServer.writeInt(PacketTypes.LIST_DIRECTORY_PACKET.getValue());
                         packetCount++;
                         // Receive the number of files in the directory
@@ -200,9 +205,18 @@ public class ClientCP1 {
                             loopTimes--;
                         }
                     }
+                } else if (command.equals("SHUTDOWN")) {
+                    if (files == null) {
+                        toServer.writeInt(PacketTypes.SHUTDOWN_PACKET.getValue());
+                        packetCount++;
+                        System.out.println("Shutting server down...");
+                    }
+                } else if (command.equals("HELP")) {
+                    System.out.println(
+                            "Please try either: UPLD <FILENAME>..., DWNLD <FILENAME>..., DEL <FILENAME>..., LSTDIR or SHUTDOWN.");
                 } else {
                     System.out.println(
-                            "Invalid command received. Please try either: UPLD <FILENAME>, DWNLD <FILENAME>, DEL <FILENAME>, or LSTDIR.");
+                            "Invalid command received. Please try either: UPLD <FILENAME>..., DWNLD <FILENAME>..., DEL <FILENAME>..., LSTDIR or SHUTDOWN.");
                 }
             } catch (Exception e) {
                 System.out.println("Connection error! Terminating client...");
@@ -306,6 +320,14 @@ public class ClientCP1 {
                             sc.close();
                             break;
                         }
+                    } else if (inSplit[0].equals("SHUTDOWN")) {
+                        if (inSplit.length == 1) {
+                            toServer.writeInt(PacketTypes.SHUTDOWN_PACKET.getValue());
+                            packetCount++;
+                            System.out.println("Closing connection and shutting server down...");
+                            sc.close();
+                            break;
+                        }
                     } else if (inSplit[0].equals("UPLD")) {
                         String[] filesToSend = null;
                         if (inSplit.length < 2)
@@ -383,6 +405,7 @@ public class ClientCP1 {
                         }
                     } else if (inSplit[0].equals("LSTDIR")) {
                         if (inSplit.length == 1) {
+                            System.out.println("Directory listing: ");
                             toServer.writeInt(PacketTypes.LIST_DIRECTORY_PACKET.getValue());
                             packetCount++;
                             // Receive the number of files in the directory
@@ -398,9 +421,12 @@ public class ClientCP1 {
                                 loopTimes--;
                             }
                         }
+                    } else if (inSplit[0].equals("HELP")) {
+                        System.out.println(
+                                "Please try either: EXIT, UPLD <FILENAME>..., DWNLD <FILENAME>..., DEL <FILENAME>..., LSTDIR or SHUTDOWN.");
                     } else {
                         System.out.println(
-                                "Invalid command received. Please try either: EXIT, UPLD <FILENAME>, DWNLD <FILENAME>, DEL <FILENAME>, or LSTDIR.");
+                                "Invalid command received. Please try either: EXIT, UPLD <FILENAME>..., DWNLD <FILENAME>..., DEL <FILENAME>..., LSTDIR or SHUTDOWN.");
                     }
                 }
             } catch (Exception e) {

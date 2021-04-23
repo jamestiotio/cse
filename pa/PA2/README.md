@@ -86,7 +86,26 @@ To run this program, first ensure that all the dependencies are met:
   - `server/certificate_100xxxx.crt` (the server's CA-signed public key)
 - All the necessary files to be transferred over the network ready in the corresponding `data/` directory
 
-After ensuring that all dependencies exist, compile both the client and server Java code files. Then, run the server program first on a terminal window, and then run the client program on a different terminal window.
+After ensuring that all dependencies exist, compile both the client and server Java code files. This can be done by simply running `make`. Then, run the server program first on a terminal window (`java ServerCP1` or `java ServerCP2`), and then run the client program on a different terminal window.
+
+There are 2 modes of operation:
+
+- Command-Line Arguments: run `java ClientCP1 <SERVER_IP_ADDRESS> <SERVER_PORT> <COMMAND> <ANY_ADDITIONAL_ARGS>` or `java ClientCP2 <SERVER_IP_ADDRESS> <SERVER_PORT> <COMMAND> <ANY_ADDITIONAL_ARGS>`.
+- Interactive Shell: run `java ClientCP1` or `java ClientCP2`, then enter the commands that you wish to perform, followed by their respective arguments.
+
+Here are the currently-available list of commands:
+
+- `UPLD <FILENAME>...`
+- `DWNLD <FILENAME>...`
+- `DEL <FILENAME>...`
+- `LSTDIR`
+- `HELP`
+- `EXIT`
+- `SHUTDOWN`
+
+In the list above, `<FILENAME>...` indicates one or more filenames.
+
+More commands coming soon! (Or maybe not so soon...)
 
 During the initial AP handshake, the client will first download the server's CA-signed public key certificate (and put it inside `download/`), and then the server will download the client's public key (and put it inside `upload/`).
 
@@ -98,6 +117,8 @@ Alternatively, for the purposes of the demo, ensure that the demo files are in t
 $ chmod +x demo.sh
 $ ./demo.sh
 ```
+
+To clean up, simply execute `make clean`.
 
 
 
@@ -133,8 +154,8 @@ In order of importance:
 
 - Implement a sequence number tracker from each side so as to prevent partial playback/replay attack within a single session.
 - Implement a concurrent, multi-threaded file data transfer method (either use threads or an executor with a fixed thread pool size; AtomicIntegers and CyclicBarriers might be needed). This is possible because we are using the ECB encryption mode of operation (for simplicity purposes).
-- Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths, etc.
+- Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths (simply to add more layerings), etc.
 - Implement the auto demo script.
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).
-- Add more extra commands like: CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
-
+- Use message digests and some hashing algorithms (such as MD5, SHA1 or SHA512) to verify on the server side that the file contents (in terms of bytes) are correct and that all data has been transferred properly.
+- Add more extra commands like: PWD, CWD, CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.

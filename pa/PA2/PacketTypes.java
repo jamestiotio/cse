@@ -19,7 +19,8 @@ public enum PacketTypes {
     LIST_DIRECTORY_PACKET (203),
     OK_PACKET (80),
     STOP_PACKET (404),
-    ERROR_PACKET (500);
+    ERROR_PACKET (500),
+    SHUTDOWN_PACKET (666);
 
     private final int value;
 

@@ -1,6 +1,7 @@
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
@@ -30,6 +31,7 @@ public class Utils {
     public static int sendEncryptedFile(DataOutputStream toServer, String fileToSend, Key key,
             String mode) throws Exception {
         int packets = 0;
+        MessageDigest md = MessageDigest.getInstance("MD5");
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -75,6 +77,7 @@ public class Utils {
     // CP2)
     public static void receiveEncryptedFile(DataInputStream fromClient, Key key, String mode,
             String direction) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("MD5");
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -97,8 +100,14 @@ public class Utils {
          */
         fromClient.readFully(encryptedFilename, 0, numBytes);
         byte[] decryptedFilename = cipher.doFinal(encryptedFilename);
+        String[] temp = new String(decryptedFilename, 0, decryptedFilename.length).split("/");
+        String currentRecursiveFolderDepth = direction;
+        for (int i = 1; i < temp.length - 1; i++) {
+            currentRecursiveFolderDepth = currentRecursiveFolderDepth.concat(temp[i]);
+            Utils.makeFolder(currentRecursiveFolderDepth);
+        }
         String filename = direction
-                + new String(decryptedFilename, 0, decryptedFilename.length).split("/")[1];
+                + new String(decryptedFilename, 0, decryptedFilename.length).split("/", 2)[1];
 
         FileOutputStream fileOutputStream = new FileOutputStream(filename);
         BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(fileOutputStream);
@@ -129,6 +138,8 @@ public class Utils {
         bufferedFileOutputStream.close();
         fileOutputStream.close();
         System.out.println(filename + " has been received.");
+
+
     }
 
     // This can be used by both sides, client and server

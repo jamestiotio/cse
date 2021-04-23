@@ -1,6 +1,7 @@
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,8 +38,10 @@ public class ServerCP1 {
             privateKeyFilename = args[2];
         }
 
+        boolean shutdown = false;
+
         // Let the server run forever until manually killed
-        while (true) {
+        while (!shutdown) {
             /*
              * This class implements server sockets. A server socket waits for requests to come in
              * over the network. It performs some operation based on that request, and then possibly
@@ -166,6 +169,20 @@ public class ServerCP1 {
                         connectionSocket.close();
                         System.out.println("Connection closed properly. Bye bye!");
                         break;
+                    }
+                    // Client should be authenticated to be able to shut down the server!
+                    else if (packetType == PacketTypes.SHUTDOWN_PACKET.getValue() && authenticatedClient) {
+                        shutdown = true;
+                        System.out.println("Closing connection and shutting down server...");
+                        if (bufferedFileOutputStream != null)
+                            bufferedFileOutputStream.close();
+                        if (fileOutputStream != null)
+                            fileOutputStream.close();
+                        fromClient.close();
+                        toClient.close();
+                        connectionSocket.close();
+                        System.out.println("Connection closed properly. Bye bye!");
+                        break;
                     } else if (packetType == PacketTypes.UPLOAD_FILE_PACKET.getValue()
                             && authenticatedClient) {
                         System.out.println("Receiving file...");
@@ -201,6 +218,7 @@ public class ServerCP1 {
                                 + new String(decryptedFilename, 0, decryptedFilename.length);
                         System.out.println("Sending file...");
                         try {
+                            toClient.writeInt(PacketTypes.UPLOAD_FILE_PACKET.getValue());
                             Utils.sendEncryptedFile(toClient, fileToSend, publicClientKey, "CP1");
                         } catch (Exception e) {
                             toClient.writeInt(PacketTypes.ERROR_PACKET.getValue());
@@ -246,7 +264,12 @@ public class ServerCP1 {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("Connection not closed properly. Bye bye!");
+                if (e instanceof EOFException) {
+                    System.out.println("Connection not closed properly. Bye bye!");
+                }
+                else {
+                    e.printStackTrace();
+                }
             }
         }
     }

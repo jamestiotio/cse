@@ -6,6 +6,17 @@
 # Timing constants indicated in this script are arbitrarily set, again for demo purposes.
 # Created by James Raphael Tiovalen (2021)
 
+# Get user's default terminal
+terms=(x-terminal-emulator gnome-terminal urxvt termit terminator konsole)
+for t in ${terms[*]}
+do
+    if [ $(command -v $t) ]
+    then
+        detected_term=$t
+        break
+    fi
+done
+
 tab="--tab"
 cmd="bash -c '<command-line_or_script>';bash"
 foo=""
@@ -14,6 +25,6 @@ for i in 1 2 ... n; do
     foo+=($tab -e "$cmd")
 done
 
-x-terminal-emulator "${foo[@]}"
+$detected_term "${foo[@]}"
 
 exit 0
