@@ -159,3 +159,4 @@ In order of importance:
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).
 - Use message digests and some hashing algorithms (such as MD5, SHA1 or SHA512) to verify on the server side that the file contents (in terms of bytes) are correct and that all data has been transferred properly.
 - Add more extra commands like: PWD, CWD, CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
+- Check for legitimacy of certificate that it is actually owned by `SecStore` (by checking its details like the institution's name, its country of creation/origin, the department, etc.)
