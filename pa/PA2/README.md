@@ -163,4 +163,6 @@ In order of importance:
 - Transfer over encrypted hashes of the username-password combinations (using concatenation) instead of the encrypted versions of the username and password themselves.
 - Add GUI to both client and server.
 - Allow actual remote data transfer between client and server (might need to debug networking issues here).
+- Add support for resuming download or upload if connection was cut improperly from the previous session.
+- Add visual progress bars for downloading or uploading (this is especially the case for larger files).
 
