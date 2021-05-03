@@ -204,6 +204,7 @@ public class ClientWithSecurity {
                     } else {
                         System.out.println("Please specify the file(s) to be uploaded!");
                     }
+                    toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                 } else if (command.equals("DWNLD")) {
                     if (files != null) {
                         for (String file : files) {
@@ -230,6 +231,7 @@ public class ClientWithSecurity {
                     } else {
                         System.out.println("Please specify the file(s) to be downloaded!");
                     }
+                    toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                 } else if (command.equals("DEL")) {
                     if (files != null) {
                         for (String file : files) {
@@ -249,6 +251,7 @@ public class ClientWithSecurity {
                     } else {
                         System.out.println("Please specify the file(s) to be deleted!");
                     }
+                    toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                 } else if (command.equals("LSTDIR")) {
                     if (files == null) {
                         System.out.println("Directory listing: ");
@@ -268,6 +271,7 @@ public class ClientWithSecurity {
                             loopTimes--;
                         }
                     }
+                    toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                 } else if (command.equals("SHUTDOWN")) {
                     if (files == null) {
                         toServer.writeInt(PacketTypes.SHUTDOWN_PACKET.getValue());
