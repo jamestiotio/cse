@@ -992,6 +992,7 @@ public class ClientWithSecurity {
                                 Utils.addTextToScrollableTextArea(logs,
                                         "Please specify the file(s) to be uploaded!");
                             }
+                            toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                         } else if (command.equals("DWNLD")) {
                             if (files.length > 0) {
                                 try {
@@ -1034,6 +1035,7 @@ public class ClientWithSecurity {
                                 Utils.addTextToScrollableTextArea(logs,
                                         "Please specify the file(s) to be downloaded!");
                             }
+                            toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                         } else if (command.equals("DEL")) {
                             if (files.length > 0) {
                                 try {
@@ -1090,6 +1092,7 @@ public class ClientWithSecurity {
                                 Utils.addTextToScrollableTextArea(logs,
                                         "Please specify the file(s) to be deleted!");
                             }
+                            toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                         } else if (command.equals("LSTDIR")) {
                             Utils.addTextToScrollableTextArea(logs, "Directory listing: ");
                             toServer.writeInt(PacketTypes.LIST_DIRECTORY_PACKET.getValue());
@@ -1106,6 +1109,7 @@ public class ClientWithSecurity {
                                         new String(decryptedFilename, 0, decryptedFilename.length));
                                 loopTimes--;
                             }
+                            toServer.writeInt(PacketTypes.STOP_PACKET.getValue());
                         } else if (command.equals("SHUTDOWN")) {
                             toServer.writeInt(PacketTypes.SHUTDOWN_PACKET.getValue());
                             Utils.addTextToScrollableTextArea(logs, "Shutting server down...");
