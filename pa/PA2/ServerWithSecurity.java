@@ -12,15 +12,21 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Map;
+import java.util.Set;
 
-public class ServerCP2 {
+public class ServerWithSecurity {
     // Include all the filepaths to the crt files
     private static String caCrtFilename = "credentials/server/certificate_1004555.crt";
     private static String privateKeyFilename = "credentials/server/private_key.der";
     public static PublicKey publicClientKey;
-    public static SecretKey sessionKey;
-    private static Map<String, String> storedLoginDetails =
-            Map.of("jamestiotio", "jamestiotio", "caramelmelmel", "caramelmelmel");
+    public static SecretKey sessionKey; // Only for CP2
+    // Use the SHA-512 algorithm for the stored login hashes
+    private static final Set<String> storedLoginHashes = Set.of(
+            "0b0a0d13f1f3d9666e9f56fbf35c11e3122809a5b3fad09f246adcfc7bc8ed2b6b8c47699189d2d8a00c40187d3571a83f7cf3c5b78066045d7cce4242971c49", // {"jamestiotio",
+                                                                                                                                                // "jamestiotio"}
+            "183d7d7abca514d877b85bb2596009e481ddce61a460c326b363ebed07b5ff3398de13687d3f37dfa0b54cd96a5b8ad8ad497b53bccdc69d8ddb509f5cec71e8" // {"caramelmelmel",
+                                                                                                                                               // "caramelmelmel"}
+    );
 
     public static void main(String[] args) {
         // Initial setup
@@ -64,6 +70,10 @@ public class ServerCP2 {
                 // Flag to indicate whether current connected client is authenticated or not
                 boolean authenticatedClient = false;
 
+                String mode = "CP2"; // Server should be able to handle multiple connections of both
+                                     // CP1 and CP2 at
+                                     // the same time
+
                 while (!connectionSocket.isClosed()) {
                     // Reads every 4 bytes interpreted as an int
                     int packetType = fromClient.readInt();
@@ -72,7 +82,15 @@ public class ServerCP2 {
                     // attacks
                     int sequence = new SecureRandom().nextInt();
 
-                    if (packetType == PacketTypes.VERIFY_SERVER_PACKET.getValue()) {
+                    if (packetType == PacketTypes.CHANGE_MODE_PACKET.getValue()) {
+                        int setMode = fromClient.readInt();
+                        if (setMode == PacketTypes.CP1_MODE_PACKET.getValue()) {
+                            mode = "CP1";
+                        } else if (setMode == PacketTypes.CP2_MODE_PACKET.getValue()) {
+                            mode = "CP2";
+                        }
+                        System.out.println("Mode has been set to: " + mode + ".");
+                    } else if (packetType == PacketTypes.VERIFY_SERVER_PACKET.getValue()) {
                         Utils.acceptChallenge(toClient, fromClient, privateServerKey,
                                 caCrtFilename);
                         toClient.flush();
@@ -89,7 +107,7 @@ public class ServerCP2 {
                             toClient.writeInt(PacketTypes.VERIFY_CLIENT_PACKET.getValue());
                             toClient.flush();
                             decryptedNonce = Utils.authenticate(nonce, toClient, fromClient,
-                                    "challenge_the_client", "CP2");
+                                    "challenge_the_client", mode);
                         } catch (Exception e) {
                             System.out.println("Authentication failed!");
                             e.printStackTrace();
@@ -119,42 +137,31 @@ public class ServerCP2 {
 
                         // Check username and password of client
                         int authPacketType = fromClient.readInt();
-                        if (authPacketType == PacketTypes.AUTH_LOGIN_USERNAME_PACKET.getValue()) {
+                        if (authPacketType == PacketTypes.AUTH_LOGIN_USER_PACKET.getValue()) {
+                            RSAKeyHelper rsaKeyHelper =
+                                    new RSAKeyHelper(publicClientKey, privateServerKey);
                             int numBytes = fromClient.readInt();
                             byte[] encryptedUsername = new byte[numBytes];
                             fromClient.readFully(encryptedUsername, 0, numBytes);
-                            RSAKeyHelper rsaKeyHelper =
-                                    new RSAKeyHelper(publicClientKey, privateServerKey);
                             byte[] decryptedUsername =
                                     rsaKeyHelper.decryptWithPrivate(encryptedUsername);
                             String username =
                                     new String(decryptedUsername, 0, decryptedUsername.length);
-                            // Check if storedLoginDetails contains the specified username
-                            if (storedLoginDetails.containsKey(username)) {
+                            int anotherNumBytes = fromClient.readInt();
+                            byte[] encryptedHash = new byte[anotherNumBytes];
+                            fromClient.readFully(encryptedHash, 0, anotherNumBytes);
+                            byte[] decryptedHash = rsaKeyHelper.decryptWithPrivate(encryptedHash);
+                            String hash = new String(decryptedHash, 0, decryptedHash.length);
+                            // Check if storedLoginHashes contains the specified hash
+                            if (storedLoginHashes.contains(hash)) {
+                                authenticatedClient = true;
                                 toClient.writeInt(PacketTypes.OK_PACKET.getValue());
                                 toClient.flush();
-                                authPacketType = fromClient.readInt();
-                                if (authPacketType == PacketTypes.AUTH_LOGIN_PASSWORD_PACKET
-                                        .getValue()) {
-                                    int anotherNumBytes = fromClient.readInt();
-                                    byte[] encryptedPassword = new byte[anotherNumBytes];
-                                    fromClient.readFully(encryptedPassword, 0, anotherNumBytes);
-                                    byte[] decryptedPassword =
-                                            rsaKeyHelper.decryptWithPrivate(encryptedPassword);
-                                    String password = new String(decryptedPassword, 0,
-                                            decryptedPassword.length);
-                                    // Check if the password of that username matches
-                                    if (storedLoginDetails.get(username).equals(password)) {
-                                        authenticatedClient = true;
-                                        toClient.writeInt(PacketTypes.OK_PACKET.getValue());
-                                        toClient.flush();
-                                        Utils.doServerSessionKey(fromClient, privateServerKey);
-                                        System.out.println("Welcome, " + username + "!");
-                                    } else {
-                                        toClient.writeInt(PacketTypes.ERROR_PACKET.getValue());
-                                        toClient.flush();
-                                    }
-                                }
+                                Utils.doServerSessionKey(fromClient, privateServerKey); // Always do
+                                                                                        // this,
+                                                                                        // regardless
+                                                                                        // of mode!
+                                System.out.println("Welcome, " + username + "!");
                             } else {
                                 toClient.writeInt(PacketTypes.ERROR_PACKET.getValue());
                                 toClient.flush();
@@ -174,7 +181,8 @@ public class ServerCP2 {
                         break;
                     }
                     // Client should be authenticated to be able to shut down the server!
-                    else if (packetType == PacketTypes.SHUTDOWN_PACKET.getValue() && authenticatedClient) {
+                    else if (packetType == PacketTypes.SHUTDOWN_PACKET.getValue()
+                            && authenticatedClient) {
                         shutdown = true;
                         System.out.println("Closing connection and shutting down server...");
                         if (bufferedFileOutputStream != null)
@@ -191,7 +199,12 @@ public class ServerCP2 {
                         System.out.println("Receiving file...");
                         try {
                             long timeStarted = System.nanoTime();
-                            Utils.receiveEncryptedFile(fromClient, sessionKey, "CP2", "upload/");
+                            if (mode.equalsIgnoreCase("CP1"))
+                                Utils.receiveEncryptedFile(fromClient, privateServerKey, "CP1",
+                                        "upload/");
+                            else
+                                Utils.receiveEncryptedFile(fromClient, sessionKey, "CP2",
+                                        "upload/");
                             long timeTaken = System.nanoTime() - timeStarted;
                             System.out.println("Upload took: " + timeTaken / 1000000.0 + " ms");
                             String successMessage = "File received!";
@@ -212,15 +225,22 @@ public class ServerCP2 {
                         int numBytes = fromClient.readInt();
                         byte[] encryptedFilename = new byte[numBytes];
                         fromClient.readFully(encryptedFilename, 0, numBytes);
+                        RSAKeyHelper rsaKeyHelper =
+                                new RSAKeyHelper(publicClientKey, privateServerKey);
                         AESCipherHelper aesCipherHelper = new AESCipherHelper(sessionKey);
-                        byte[] decryptedFilename =
-                                aesCipherHelper.decryptWithKey(encryptedFilename);
+                        byte[] decryptedFilename = ((mode.equalsIgnoreCase("CP1"))
+                                ? rsaKeyHelper.decryptWithPrivate(encryptedFilename)
+                                : aesCipherHelper.decryptWithKey(encryptedFilename));
                         String fileToSend = "upload/"
                                 + new String(decryptedFilename, 0, decryptedFilename.length);
                         System.out.println("Sending file...");
                         try {
                             toClient.writeInt(PacketTypes.UPLOAD_FILE_PACKET.getValue());
-                            Utils.sendEncryptedFile(toClient, fileToSend, sessionKey, "CP2");
+                            if (mode.equalsIgnoreCase("CP1"))
+                                Utils.sendEncryptedFile(toClient, fileToSend, publicClientKey,
+                                        "CP1");
+                            else
+                                Utils.sendEncryptedFile(toClient, fileToSend, sessionKey, "CP2");
                         } catch (Exception e) {
                             toClient.writeInt(PacketTypes.ERROR_PACKET.getValue());
                         }
@@ -229,9 +249,12 @@ public class ServerCP2 {
                         int numBytes = fromClient.readInt();
                         byte[] encryptedFilename = new byte[numBytes];
                         fromClient.readFully(encryptedFilename, 0, numBytes);
+                        RSAKeyHelper rsaKeyHelper =
+                                new RSAKeyHelper(publicClientKey, privateServerKey);
                         AESCipherHelper aesCipherHelper = new AESCipherHelper(sessionKey);
-                        byte[] decryptedFilename =
-                                aesCipherHelper.decryptWithKey(encryptedFilename);
+                        byte[] decryptedFilename = ((mode.equalsIgnoreCase("CP1"))
+                                ? rsaKeyHelper.decryptWithPrivate(encryptedFilename)
+                                : aesCipherHelper.decryptWithKey(encryptedFilename));
                         File file = new File("upload/"
                                 + new String(decryptedFilename, 0, decryptedFilename.length));
                         if (file.delete()) {
@@ -252,10 +275,13 @@ public class ServerCP2 {
                         File directory = new File("upload");
                         String[] files = directory.list();
                         toClient.writeInt(files.length);
+                        RSAKeyHelper rsaKeyHelper =
+                                new RSAKeyHelper(publicClientKey, privateServerKey);
                         AESCipherHelper aesCipherHelper = new AESCipherHelper(sessionKey);
                         for (String filename : files) {
-                            byte[] encryptedFilename =
-                                    aesCipherHelper.encryptWithKey(filename.getBytes());
+                            byte[] encryptedFilename = ((mode.equalsIgnoreCase("CP1"))
+                                    ? rsaKeyHelper.encryptWithPublic(filename.getBytes())
+                                    : aesCipherHelper.encryptWithKey(filename.getBytes()));
                             toClient.writeInt(encryptedFilename.length);
                             toClient.write(encryptedFilename, 0, encryptedFilename.length);
                             toClient.flush();
@@ -265,8 +291,7 @@ public class ServerCP2 {
             } catch (Exception e) {
                 if (e instanceof EOFException) {
                     System.out.println("Connection not closed properly. Bye bye!");
-                }
-                else {
+                } else {
                     e.printStackTrace();
                 }
             }

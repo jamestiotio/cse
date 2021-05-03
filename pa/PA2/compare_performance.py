@@ -27,7 +27,7 @@ def main():
             ax.text(
                 x,
                 y,
-                f"({x:.2f}, {y:.2f})",
+                f"({x:.0f}, {y:.2f})",
                 color=color,
                 fontsize=8,
                 horizontalalignment="right",

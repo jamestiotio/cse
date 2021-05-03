@@ -1,13 +1,15 @@
 # Programming Assignment 2: Secure File Transfer Protocol
 
-> Basic FTPS Implementation.
+> Basic Persistent FTPS Implementation.
 
 Team Members (Pair ID 0, Class CI03):
 
 - [James Raphael Tiovalen](https://github.com/jamestiotio)
 - [Leong Yun Qin Melody](https://github.com/caramelmelmel)
 
-> Same partnership as PA1. We implement a custom modified (and fairly simplistic) version of FTPS over SSL/TLS instead of SFTP over SSH due to the requirements of the assignment.
+> Same partnership as PA1. We implement a custom modified (and fairly simplistic) version of FTPS over SSL/TLS instead of SFTP over SSH due to the requirements of the assignment. For this project, we shall not use any external library dependencies (i.e., we are only using native and built-in Java SE JDK libraries).
+
+Video Demo Link: ![PA2 FTPS Video Demo]()
 
 In this programming assignment, we are tasked to implement a secure file upload application from a client to an Internet file server (following the client-server paradigm). By secure, we mean two properties. First, before you do your upload as the client, you should authenticate the identity of the file server so you won’t leak your data to random entities including criminals. Second, while carrying out the upload, you should be able to protect the confidentiality of the data against eavesdropping by any curious adversaries.
 
@@ -86,14 +88,17 @@ To run this program, first ensure that all the dependencies are met:
   - `server/certificate_100xxxx.crt` (the server's CA-signed public key)
 - All the necessary files to be transferred over the network ready in the corresponding `data/` directory
 
-After ensuring that all dependencies exist, compile both the client and server Java code files. This can be done by simply running `make`. Then, run the server program first on a terminal window (`java ServerCP1` or `java ServerCP2`), and then run the client program on a different terminal window.
+After ensuring that all dependencies exist, compile both the client and server Java code files. This can be done by simply running `make`. Then, run the server program first on a terminal window, and then run the client program on a different terminal window.
 
-There are 2 modes of operation:
+To run the server, run `java ServerWithSecurity`.
 
-- Command-Line Arguments: run `java ClientCP1 <SERVER_IP_ADDRESS> <SERVER_PORT> <COMMAND> <ANY_ADDITIONAL_ARGS>` or `java ClientCP2 <SERVER_IP_ADDRESS> <SERVER_PORT> <COMMAND> <ANY_ADDITIONAL_ARGS>`.
-- Interactive Shell: run `java ClientCP1` or `java ClientCP2`, then enter the commands that you wish to perform, followed by their respective arguments.
+Meanwhile, there are 3 modes of operation for the client:
 
-Here are the currently-available list of commands:
+- Command-Line Arguments: run `java ClientWithSecurity CLI <SERVER_IP_ADDRESS> <SERVER_PORT> <MODE> <USERNAME> <PASSWORD> <COMMAND> <ANY_ADDITIONAL_ARGS>`.
+- Interactive Shell (Live Demo Version): run `java ClientWithSecurity SHELL <SERVER_IP_ADDRESS> <SERVER_PORT> <MODE> <USERNAME> <PASSWORD>`, then enter the commands that you wish to perform, followed by their respective arguments.
+- Graphical Unit Interface: run `java ClientWithSecurity GUI`, then interact with the GUI window accordingly.
+
+Here are the currently-available list of commands (for CLI and SHELL modes of the client):
 
 - `UPLD <FILENAME>...`
 - `DWNLD <FILENAME>...`
@@ -106,6 +111,8 @@ Here are the currently-available list of commands:
 In the list above, `<FILENAME>...` indicates one or more filenames.
 
 More commands coming soon! (Or maybe not so soon...)
+
+For all operations, commands and functionalities, the CP2 mode is assumed by default (since generally, CP2 is much faster than CP1, as shown in the following performance analysis and comparison section).
 
 During the initial AP handshake, the client will first download the server's CA-signed public key certificate (and put it inside `download/`), and then the server will download the client's public key (and put it inside `upload/`).
 
@@ -157,12 +164,15 @@ In order of importance:
 - Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths (simply to add more layerings), etc.
 - Implement the auto demo script.
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).
-- Use message digests and some hashing algorithms (such as MD5, SHA1 or SHA512) to verify on the server side that the file contents (in terms of bytes) are correct and that all data has been transferred properly.
 - Add more extra commands like: PWD, CWD, CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
 - Check for legitimacy of certificate that it is actually owned by `SecStore` (by checking its details like the institution's name, its country of creation/origin, the department, etc.)
-- Transfer over encrypted hashes of the username-password combinations (using concatenation) instead of the encrypted versions of the username and password themselves.
-- Add GUI to both client and server.
+- Improve the hashing algorithm of username-password concatenations/combinations (such as by using PBKDF2, BCrypt, Scrypt or Argon2 with some salting and peppering).
+- Add GUI to server (this will only affect the method of logging and displaying logs and files on server).
 - Allow actual remote data transfer between client and server (might need to debug networking issues here).
 - Add support for resuming download or upload if connection was cut improperly from the previous session.
-- Add visual progress bars for downloading or uploading (this is especially the case for larger files).
+- Add visual progress bars for downloading or uploading (this is especially the case for larger files), as well as GUI connection status indicator.
+- Allow connection between multiple client and/or multiple server instances (particularly problematic with the management of hardcoded filenames of the corresponding keys).
+- Perform lossless compression (such as by using ZIP) to reduce/decrease the amount of time taken to transfer files and thereby increasing the overall file transfer speed (multiple files and even entire directories can be zipped into the same ZIP archive file as well, thereby also minimizing some unnecessary overhead). We only need the ZIP file to exist in memory (RAM) instead of using temporary real files on disk.
+- Improve the argument parsing method to allow splitting the input string on spaces except for filepaths. Also need to parse metacharacters appropriately.
+- Improve and customize the GUI look-and-feel even further (perhaps by using Electron with Java on desktop or by creating a web-based front-end application instead?).
 

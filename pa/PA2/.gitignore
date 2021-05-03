@@ -10,6 +10,9 @@ credentials/server/*
 credentials/client/*
 !credentials/client/placeholder
 
+upload/
+download/
+
 # Compiled class file
 *.class
 

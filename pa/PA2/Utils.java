@@ -1,5 +1,8 @@
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
@@ -9,6 +12,13 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import javax.swing.JTextArea;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class Utils {
     // The CA's public key is visible to everyone
@@ -31,7 +41,7 @@ public class Utils {
     public static int sendEncryptedFile(DataOutputStream toServer, String fileToSend, Key key,
             String mode) throws Exception {
         int packets = 0;
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -68,6 +78,25 @@ public class Utils {
         bufferedFileInputStream.close();
         fileInputStream.close();
 
+        toServer.writeInt(PacketTypes.FILE_DIGEST_PACKET.getValue());
+        // Incremental instead of loading the entire file at once to avoid OutOfMemoryError
+        try (InputStream is = Files.newInputStream(Paths.get(fileToSend));
+                DigestInputStream dis = new DigestInputStream(is, md)) {
+            /* Read decorated stream (dis) to EOF as normal... */
+        }
+        byte[] digest = md.digest();
+        BigInteger no = new BigInteger(1, digest);
+        String hash = no.toString(16);
+        while (hash.length() < 128) {
+            hash = "0" + hash;
+        }
+        // Use the platform's default charset
+        byte[] encryptedDigest = cipher.doFinal(hash.getBytes());
+        toServer.writeInt(encryptedDigest.length);
+        toServer.write(encryptedDigest);
+        toServer.flush();
+        packets += 3;
+
         System.out.println(fileToSend + " has been sent.");
 
         return packets;
@@ -77,7 +106,7 @@ public class Utils {
     // CP2)
     public static void receiveEncryptedFile(DataInputStream fromClient, Key key, String mode,
             String direction) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
         Cipher cipher = ((mode.equalsIgnoreCase("CP1")) ? Cipher.getInstance("RSA/ECB/PKCS1Padding")
                 : Cipher.getInstance("AES/ECB/PKCS5Padding"));
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -137,9 +166,36 @@ public class Utils {
 
         bufferedFileOutputStream.close();
         fileOutputStream.close();
+
+        if (fromClient.readInt() == PacketTypes.FILE_DIGEST_PACKET.getValue()) {
+            // Get expected file digest byte array
+            int digestNumBytes = fromClient.readInt();
+            byte[] encryptedDigest = new byte[digestNumBytes];
+            fromClient.readFully(encryptedDigest, 0, digestNumBytes);
+            byte[] decryptedDigest = cipher.doFinal(encryptedDigest);
+            // Use the platform's default charset
+            String expected = new String(decryptedDigest);
+
+            // Get actual file digest byte array
+            // Incremental instead of loading the entire file at once to avoid OutOfMemoryError
+            try (InputStream is = Files.newInputStream(Paths.get(filename));
+                    DigestInputStream dis = new DigestInputStream(is, md)) {
+                /* Read decorated stream (dis) to EOF as normal... */
+            }
+            byte[] digest = md.digest();
+            BigInteger no = new BigInteger(1, digest);
+            String actual = no.toString(16);
+            while (actual.length() < 128) {
+                actual = "0" + actual;
+            }
+
+            if (actual.equals(expected)) {
+                System.out.println(
+                        "File digest is properly retained and integrity of file contents is verified!");
+            }
+        }
+
         System.out.println(filename + " has been received.");
-
-
     }
 
     // This can be used by both sides, client and server
@@ -210,11 +266,7 @@ public class Utils {
 
             // Get public key from signedCertificate
             PublicKey publicServerKey = signedCertificate.getPublicKey();
-            if (mode.equalsIgnoreCase("CP1")) {
-                ClientCP1.publicServerKey = publicServerKey;
-            } else {
-                ClientCP2.publicServerKey = publicServerKey;
-            }
+            ClientWithSecurity.publicServerKey = publicServerKey;
 
             // Decrypt encrypted nonce using public key
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -238,11 +290,7 @@ public class Utils {
             // Thus, we only use the client's public key to verify the nonce
             // Note that we do not need to encrypt the client's public key since it is, well, public
             PublicKey publicClientKey = PublicKeyReader.get(certificateFilename);
-            if (mode.equalsIgnoreCase("CP1")) {
-                ServerCP1.publicClientKey = publicClientKey;
-            } else {
-                ServerCP2.publicClientKey = publicClientKey;
-            }
+            ServerWithSecurity.publicClientKey = publicClientKey;
 
             // Decrypt encrypted nonce using public key
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -252,6 +300,7 @@ public class Utils {
         }
     }
 
+    // Accept nonce-based challenge to prove liveness (can be used by both client and server)
     public static void acceptChallenge(DataOutputStream toClient, DataInputStream fromClient,
             PrivateKey privateKey, String fileToSend) throws Exception {
         // Receive nonce (readInt() is blocking)
@@ -304,7 +353,7 @@ public class Utils {
     public static void doClientSessionKey(DataOutputStream toServer, PublicKey key)
             throws Exception {
         AESKeyHelper aesKeyHelper = new AESKeyHelper(256);
-        ClientCP2.sessionKey = aesKeyHelper.getsessionKey();
+        ClientWithSecurity.sessionKey = aesKeyHelper.getsessionKey();
         // Encrypt session key using public key
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -323,7 +372,59 @@ public class Utils {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, key);
         byte[] decryptedPublicSessionKey = cipher.doFinal(encryptedPublicSessionKey);
-        ServerCP2.sessionKey = new SecretKeySpec(decryptedPublicSessionKey, 0,
+        ServerWithSecurity.sessionKey = new SecretKeySpec(decryptedPublicSessionKey, 0,
                 decryptedPublicSessionKey.length, "AES");
+    }
+
+    // Modified from https://www.geeksforgeeks.org/sha-512-hash-in-java/
+    public static String generateHash(String username, String password) {
+        try {
+            String pair = username + password;
+
+            // getInstance() method is called with algorithm SHA-512
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(pair.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+
+            // Add preceding/leading 0s to make it into a 128-hex digit string
+            while (hashtext.length() < 128) {
+                hashtext = "0" + hashtext;
+            }
+
+            // Return the HashText
+            return hashtext;
+        }
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // TODO: Use JTextPane instead to allow custom text styling
+    public static void addTextToScrollableTextArea(JTextArea textArea, String text) {
+        textArea.append(text + "\n");
+        textArea.setCaretPosition(textArea.getDocument().getLength());
+    }
+
+    public static void sendEncryptedPacketType(int packetType, DataOutputStream toParty) {
+        // TODO
+    }
+
+    public static int receiveEncryptedPacketType(DataInputStream fromParty) {
+        // TODO
+        return 0;
+    }
+
+    public static void printProgressBar() {
+        // TODO
     }
 }
