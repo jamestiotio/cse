@@ -9,7 +9,7 @@ Team Members (Pair ID 0, Class CI03):
 
 > Same partnership as PA1. We implement a custom modified (and fairly simplistic) version of FTPS over SSL/TLS instead of SFTP over SSH due to the requirements of the assignment. For this project, we shall not use any external library dependencies (i.e., we are only using native and built-in Java SE JDK libraries).
 
-Video Demo Link: ![PA2 FTPS Video Demo]()
+Video Demo Link: [PA2 FTPS Video Demo](https://youtu.be/i0Sqo7oS3Oo)
 
 In this programming assignment, we are tasked to implement a secure file upload application from a client to an Internet file server (following the client-server paradigm). By secure, we mean two properties. First, before you do your upload as the client, you should authenticate the identity of the file server so you won’t leak your data to random entities including criminals. Second, while carrying out the upload, you should be able to protect the confidentiality of the data against eavesdropping by any curious adversaries.
 
