@@ -807,6 +807,7 @@ public class ClientWithSecurity {
                         newC.gridy = 6;
                         newC.insets = new Insets(10, 10, 10, 10);
                         contentPane.add(newChooser, newC);
+                        // These are best practices
                         contentPane.revalidate();
                         contentPane.repaint();
                     } else if (value.equalsIgnoreCase("DWNLD") || value.equalsIgnoreCase("DEL")) {
@@ -1155,7 +1156,7 @@ public class ClientWithSecurity {
             System.exit(1);
         }
 
-        if (!args[0].equalsIgnoreCase("GUI")) {
+        if (args[0].equalsIgnoreCase("CLI") || args[0].equalsIgnoreCase("SHELL")) {
             long timeTaken = System.nanoTime() - timeStarted;
             System.out.println("Program took: " + timeTaken / 1000000.0 + " ms to run.");
             System.out.println("Number of meaningful packets sent: " + packetCount);
