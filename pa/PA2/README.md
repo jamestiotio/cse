@@ -137,6 +137,8 @@ To recap, this is the original authentication handshake protocol specified in th
 
 The aforementioned authentication protocol is vulnerable to replay/playback attacks and susceptible to man-in-the-middle attacks for both sides (i.e., server does not know if it is talking to a live client and client does not know if it is talking to a live server), and the server cannot authenticate the client. The first issue can be solved via using freshly-generated nonces, which would be different for every session (which would prevent any malicious parties from just replaying or passing the messages back-and-forth in an attempt to either obtain the messages or perform malicious DDoS-related attacks). The second issue can be solved via login credentials (not using signed client certificates, which actually does not make sense in real life).
 
+This implementation supports data confidentiality, data integrity and data origin authentication, as well as replay protection. The login system also ensures network-level peer authentication since connecting users/clients will be required to authenticate themselves before a session is established with the server.
+
 These would be the appropriate space-time diagrams of our corrected authentication protocol specifications:
 
 - AP: ![Fixed Authentication Protocol](docs/fixed_ap.png)
@@ -160,6 +162,7 @@ As clearly seen from the benchmarking plot, CP2 (using AES) is a much more perfo
 In order of importance:
 
 - Implement a sequence number tracker from each side so as to prevent partial playback/replay attack within a single session.
+- Implement forward secrecy by generating a new and unique session key for each message (instead of just for each session). This might cost some computational overhead compared to the normal handshake without forward secrecy.
 - Implement a concurrent, multi-threaded file data transfer method (either use threads or an executor with a fixed thread pool size; AtomicIntegers and CyclicBarriers might be needed). This is possible because we are using the ECB encryption mode of operation (for simplicity purposes).
 - Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths (simply to add more layerings), etc.
 - Implement the auto demo script.
