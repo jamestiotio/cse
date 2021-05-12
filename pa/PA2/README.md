@@ -178,4 +178,7 @@ In order of importance:
 - Perform lossless compression (such as by using ZIP) to reduce/decrease the amount of time taken to transfer files and thereby increasing the overall file transfer speed (multiple files and even entire directories can be zipped into the same ZIP archive file as well, thereby also minimizing some unnecessary overhead). We only need the ZIP file to exist in memory (RAM) instead of using temporary real files on disk.
 - Improve the argument parsing method to allow splitting the input string on spaces except for filepaths. Also need to parse metacharacters appropriately.
 - Improve and customize the GUI look-and-feel even further (perhaps by using Electron with Java on desktop or by creating a web-based front-end application instead?).
+- Add option to automatically force overwriting files and prompt user by default.
+- Add options to pipe input/output to stdin/stdout of the other side.
+- Add basic shell-related features, such as tab auto-completion and command history, to the client's SHELL mode.
 
