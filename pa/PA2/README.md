@@ -11,7 +11,7 @@ Team Members (Pair ID 0, Class CI03):
 
 Video Demo Link: [PA2 FTPS Video Demo](https://youtu.be/i0Sqo7oS3Oo)
 
-In this programming assignment, we are tasked to implement a secure file upload application from a client to an Internet file server (following the client-server paradigm). By secure, we mean two properties. First, before you do your upload as the client, you should authenticate the identity of the file server so you won’t leak your data to random entities including criminals. Second, while carrying out the upload, you should be able to protect the confidentiality of the data against eavesdropping by any curious adversaries.
+In this programming assignment, we are tasked to implement a secure file upload application from a client to an Internet file server (following the client-server paradigm). By secure, we mean two properties. First, before you do your upload as the client, you should authenticate the identity of the file server so you won’t leak your data to random entities including criminals. You also want to ensure that you’re talking to a live server too. Second, while carrying out the upload, you should be able to protect the confidentiality of the data against eavesdropping by any curious adversaries. In real life situations, the server must also authenticate the client’s identity too. It is alright if you choose not to do this for this assignment.
 
 The server will be called `SecStore`. It’s an Internet server that is running at some IP address, ready to accept connection requests from clients. When a client has a file to upload, it will:
 
@@ -35,7 +35,7 @@ In particular, these are the basic requirements:
 
 6. Implement CP2 (Confidentiality Protocol 2) in your file upload application. This protocol uses AES for data confidentiality. Your protocol must negotiate a session key for the AES after the client has established a connection with the server. It must also ensure the confidentiality of the session key itself.
 
-7. **Measure the data throughput** of CPL1 vs. CPL2 for uploading files of a range of sizes. Plot your results, and compare their performance.
+7. **Measure the data throughput** of CP1 vs. CP2 for uploading files of a range of sizes. Plot your results, and compare their performance.
 
 System requirements: implemented in Java using the Java Cryptography Extension (JCE), which should already be included in a standard Java distribution.
 
