@@ -181,4 +181,5 @@ In order of importance:
 - Add option to automatically force overwriting files and prompt user by default.
 - Add options to pipe input/output to stdin/stdout of the other side.
 - Add basic shell-related features, such as tab auto-completion and command history, to the client's SHELL mode.
+- Add another cryptography protocol option that utilizes a post-quantum cryptographic algorithm, such as NTRU (might need to use and import external dependencies for this, such as [this](https://github.com/tbuktu/ntru)).
 
