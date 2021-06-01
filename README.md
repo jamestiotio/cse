@@ -1,4 +1,7 @@
 # cse
+
+*"Knowledge is a gift, for those who know how to use it."*
+
 SUTD 2021 50.005 Computer System Engineering Code Dump
 
 This repository is divided into 5 sections/folders/directories:
