@@ -14,4 +14,4 @@ This repository is divided into 5 sections/folders/directories:
 
 ## Small GCC Compilation Note
 
-Whenever `pthread.h` or `semaphore.h` is included, do remember to include either the `-pthread` or the `-lpthread` compilation flag to `gcc`.
+Whenever `pthread.h` or `semaphore.h` is included, do remember to include either the `-pthread` or the `-lpthread` compilation flag to `gcc`. Use `-pthread` for most portability.
