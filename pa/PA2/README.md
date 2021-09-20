@@ -164,7 +164,7 @@ In order of importance:
 - Implement a sequence number tracker from each side so as to prevent partial playback/replay attack within a single session.
 - Implement forward secrecy by generating a new and unique session key for each message (instead of just for each session). This might cost some computational overhead compared to the normal handshake without forward secrecy.
 - Implement a concurrent, multi-threaded file data transfer method (either use threads or an executor with a fixed thread pool size; AtomicIntegers and CyclicBarriers might be needed). This is possible because we are using the ECB encryption mode of operation (for simplicity purposes).
-- Encrypt other potentially exposed metadata, such as packet types, data stream buffer lengths (simply to add more layerings), etc.
+- Encrypt other potentially exposed metadata, such as packet types, message digests, data stream buffer lengths (simply to add more layerings), etc.
 - Implement the auto demo script.
 - Improve code modularity and refactor some structure of the codebase (client-side is quite repetitive and not that modular).
 - Add more extra commands like: PWD, CWD, CP, MV, MKDIR, RMDIR, CAT, HEAD, TAIL, MORE, LESS, WC, TAC, OD, NL, HEXDUMP/HD, etc.
