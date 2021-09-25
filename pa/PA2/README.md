@@ -1,6 +1,6 @@
 # Programming Assignment 2: Secure File Transfer Protocol
 
-> Basic Persistent FTPS Implementation.
+> Basic Persistent FTPS Implementation. Achieved Second Runner-Up (Rank #3) in the Final Competition.
 
 Team Members (Pair ID 0, Class CI03):
 
