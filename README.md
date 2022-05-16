@@ -1,6 +1,8 @@
 # cse
 
-*"Knowledge is a gift, for those who know how to use it."*
+_"Knowledge is a gift, for those who know how to use it."_
+
+_"We can explain it to you, but we can’t understand it for you."_
 
 SUTD 2021 50.005 Computer System Engineering Code Dump
 
