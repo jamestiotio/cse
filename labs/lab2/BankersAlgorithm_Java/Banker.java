@@ -5,18 +5,19 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class Banker {
-	private int numberOfCustomers;	// the number of customers
-	private int numberOfResources;	// the number of resources
+	private int numberOfCustomers; // the number of customers
+	private int numberOfResources; // the number of resources
 
-	private int[] available; 	// the available amount of each resource
-	private int[][] maximum; 	// the maximum demand of each customer
-	private int[][] allocation;	// the amount currently allocated
-	private int[][] need;		// the remaining needs of each customer
+	private int[] available; // the available amount of each resource
+	private int[][] maximum; // the maximum demand of each customer
+	private int[][] allocation; // the amount currently allocated
+	private int[][] need; // the remaining needs of each customer
 
 	/**
 	 * Constructor for the Banker class.
-	 * @param resources          An array of the available count for each resource.
-	 * @param numberOfCustomers  The number of customers.
+	 * 
+	 * @param resources An array of the available count for each resource.
+	 * @param numberOfCustomers The number of customers.
 	 */
 	public Banker(int[] resources, int numberOfCustomers) {
 		// Set the number of resources
@@ -36,14 +37,17 @@ public class Banker {
 
 	/**
 	 * Sets the maximum number of demand of each resource for a customer.
-	 * @param customerIndex  The customer's index (0-indexed).
-	 * @param maximumDemand  An array of the maximum demanded count for each resource.
+	 * 
+	 * @param customerIndex The customer's index (0-indexed).
+	 * @param maximumDemand An array of the maximum demanded count for each resource.
 	 */
 	public void setMaximumDemand(int customerIndex, int[] maximumDemand) {
 		// Add customer, update maximum and need
 		this.maximum[customerIndex] = maximumDemand;
-		for (int i = 0; i < this.numberOfResources; i++) { // Need is a n by m matrix (n rows/customers, m columns/resources)
-			this.need[customerIndex][i] = this.maximum[customerIndex][i] - this.allocation[customerIndex][i];
+		for (int i = 0; i < this.numberOfResources; i++) { // Need is a n by m matrix (n
+															// rows/customers, m columns/resources)
+			this.need[customerIndex][i] =
+					this.maximum[customerIndex][i] - this.allocation[customerIndex][i];
 		}
 	}
 
@@ -51,47 +55,49 @@ public class Banker {
 	 * Prints the current state of the bank.
 	 */
 	public void printState() {
-        System.out.println("\nCurrent state:");
-        // print available
-        System.out.println("Available:");
-        System.out.println(Arrays.toString(available));
-        System.out.println("");
+		System.out.println("\nCurrent state:");
+		// print available
+		System.out.println("Available:");
+		System.out.println(Arrays.toString(available));
+		System.out.println("");
 
-        // print maximum
-        System.out.println("Maximum:");
-        for (int[] aMaximum : maximum) {
-            System.out.println(Arrays.toString(aMaximum));
-        }
-        System.out.println("");
-        // print allocation
-        System.out.println("Allocation:");
-        for (int[] anAllocation : allocation) {
-            System.out.println(Arrays.toString(anAllocation));
-        }
-        System.out.println("");
-        // print need
-        System.out.println("Need:");
-        for (int[] aNeed : need) {
-            System.out.println(Arrays.toString(aNeed));
-        }
-        System.out.println("");
+		// print maximum
+		System.out.println("Maximum:");
+		for (int[] aMaximum : maximum) {
+			System.out.println(Arrays.toString(aMaximum));
+		}
+		System.out.println("");
+		// print allocation
+		System.out.println("Allocation:");
+		for (int[] anAllocation : allocation) {
+			System.out.println(Arrays.toString(anAllocation));
+		}
+		System.out.println("");
+		// print need
+		System.out.println("Need:");
+		for (int[] aNeed : need) {
+			System.out.println(Arrays.toString(aNeed));
+		}
+		System.out.println("");
 	}
 
 	/**
-	 * Requests resources for a customer loan.
-	 * If the request leave the bank in a safe state, it is carried out.
-	 * @param customerIndex  The customer's index (0-indexed).
-	 * @param request        An array of the requested count for each resource.
+	 * Requests resources for a customer loan. If the request leave the bank in a safe state, it is
+	 * carried out.
+	 * 
+	 * @param customerIndex The customer's index (0-indexed).
+	 * @param request An array of the requested count for each resource.
 	 * @return true if the requested resources can be loaned, else false.
 	 */
 	public synchronized boolean requestResources(int customerIndex, int[] request) {
 		// Print the request
 		System.out.println("Customer " + customerIndex + " requesting");
-        System.out.println(Arrays.toString(request));
+		System.out.println(Arrays.toString(request));
 
 		// Check if request larger than need or available
 		for (int i = 0; i < this.numberOfResources; i++) {
-			if ((request[i] > this.need[customerIndex][i]) || (request[i] > this.available[i])) return false;
+			if ((request[i] > this.need[customerIndex][i]) || (request[i] > this.available[i]))
+				return false;
 		}
 
 		// Check if the state is safe or not
@@ -104,13 +110,15 @@ public class Banker {
 			}
 
 			return true;
-		} else return false;
+		} else
+			return false;
 	}
 
 	/**
 	 * Releases resources borrowed by a customer. Assume release is valid for simplicity.
-	 * @param customerIndex  The customer's index (0-indexed).
-	 * @param release        An array of the release count for each resource.
+	 * 
+	 * @param customerIndex The customer's index (0-indexed).
+	 * @param release An array of the release count for each resource.
 	 */
 	public synchronized void releaseResources(int customerIndex, int[] release) {
 		// Print the release
@@ -127,10 +135,10 @@ public class Banker {
 
 	/**
 	 * Checks if the request will leave the bank in a safe state.
-	 * @param customerIndex  The customer's index (0-indexed).
-	 * @param request        An array of the requested count for each resource.
-	 * @return true if the requested resources will leave the bank in a
-	 *         safe state, else false
+	 * 
+	 * @param customerIndex The customer's index (0-indexed).
+	 * @param request An array of the requested count for each resource.
+	 * @return true if the requested resources will leave the bank in a safe state, else false
 	 */
 	private synchronized boolean checkSafe(int customerIndex, int[] request) {
 		// Check if the state is safe
@@ -161,7 +169,8 @@ public class Banker {
 				boolean needDoesNotExceedWork = true;
 
 				for (int j = 0; j < this.numberOfResources; j++) {
-					if (tempNeed[i][j] > work[j]) needDoesNotExceedWork = false;
+					if (tempNeed[i][j] > work[j])
+						needDoesNotExceedWork = false;
 				}
 
 				if (!finish[i] && needDoesNotExceedWork) {
@@ -184,24 +193,26 @@ public class Banker {
 
 		// Check if all of the entries in the finish vector are true
 		for (int i = 0; i < this.numberOfCustomers; i++) {
-			if (!finish[i]) return false;
+			if (!finish[i])
+				return false;
 		}
 
 		return true;
 	}
 
 	/**
-	 * Parses and runs the file simulating a series of resource request and releases.
-	 * Provided for your convenience.
-	 * @param filename  The name of the file.
+	 * Parses and runs the file simulating a series of resource request and releases. Provided for
+	 * your convenience.
+	 * 
+	 * @param filename The name of the file.
 	 */
 	public static void runFile(String filename) {
 		try {
 			BufferedReader fileReader = new BufferedReader(new FileReader(filename));
 
 			String line = null;
-			String [] tokens = null;
-			int [] resources = null;
+			String[] tokens = null;
+			int[] resources = null;
 
 			int n, m;
 
@@ -246,7 +257,7 @@ public class Banker {
 							resources[i] = Integer.parseInt(tokens[i]);
 						theBank.setMaximumDemand(customerIndex, resources);
 					} catch (Exception e) {
-						System.out.println("Error parsing resources on line "+lineNumber+".");
+						System.out.println("Error parsing resources on line " + lineNumber + ".");
 						fileReader.close();
 						return;
 					}
@@ -259,7 +270,7 @@ public class Banker {
 							resources[i] = Integer.parseInt(tokens[i]);
 						theBank.requestResources(customerIndex, resources);
 					} catch (Exception e) {
-						System.out.println("Error parsing resources on line "+lineNumber+".");
+						System.out.println("Error parsing resources on line " + lineNumber + ".");
 						fileReader.close();
 						return;
 					}
@@ -272,7 +283,7 @@ public class Banker {
 							resources[i] = Integer.parseInt(tokens[i]);
 						theBank.releaseResources(customerIndex, resources);
 					} catch (Exception e) {
-						System.out.println("Error parsing resources on line "+lineNumber+".");
+						System.out.println("Error parsing resources on line " + lineNumber + ".");
 						fileReader.close();
 						return;
 					}
@@ -282,16 +293,17 @@ public class Banker {
 			}
 			fileReader.close();
 		} catch (IOException e) {
-			System.out.println("Error opening: "+filename);
+			System.out.println("Error opening: " + filename);
 		}
 
 	}
 
 	/**
 	 * Main function
-	 * @param args  The command line arguments
+	 * 
+	 * @param args The command line arguments
 	 */
-	public static void main(String [] args) {
+	public static void main(String[] args) {
 		if (args.length > 0) {
 			runFile(args[0]);
 		}
